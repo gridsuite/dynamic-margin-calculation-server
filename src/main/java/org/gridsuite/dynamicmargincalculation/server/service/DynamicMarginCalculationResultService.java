@@ -7,8 +7,8 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
-import com.powsybl.ws.commons.computation.service.AbstractComputationResultService;
 import jakarta.transaction.Transactional;
+import org.gridsuite.computation.service.AbstractComputationResultService;
 import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationResultEntity;
