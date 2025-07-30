@@ -7,6 +7,7 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
+import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationResultEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationResultRepository;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -74,6 +76,17 @@ class DynamicMarginCalculationResultServiceTest {
         LOGGER.info("Expected result status = {}", DynamicMarginCalculationStatus.NOT_DONE);
         LOGGER.info("Actual updated result status = {}", updatedResultEntityOpt.get().getStatus());
         assertThat(updatedResultEntityOpt.get().getStatus()).isSameAs(DynamicMarginCalculationStatus.NOT_DONE);
+
+        // --- update entity with non-existing UUID --- //
+        LOGGER.info("Test update status with non-existing UUID");
+        UUID nonExistingUuid = UUID.randomUUID();
+
+        // should throw DynamicMarginCalculationException since the UUID doesn't exist
+        assertThatThrownBy(() -> dynamicSecurityAnalysisResultService.updateResult(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
+                .isInstanceOf(DynamicMarginCalculationException.class)
+                .hasMessageContaining("Result uuid not found: " + nonExistingUuid);
+
+        LOGGER.info("Non-existing UUID update threw expected exception");
 
         // --- delete result --- //
         LOGGER.info("Test delete a result");
