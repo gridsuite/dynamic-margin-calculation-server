@@ -11,8 +11,8 @@ import jakarta.transaction.Transactional;
 import org.gridsuite.computation.service.AbstractComputationResultService;
 import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
-import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationResultEntity;
-import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationResultRepository;
+import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
+import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,55 +32,56 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
 
     public static final String MSG_RESULT_UUID_NOT_FOUND = "Result uuid not found: ";
 
-    private final DynamicMarginCalculationResultRepository resultRepository;
+    private final DynamicMarginCalculationStatusRepository statusRepository;
 
-    public DynamicMarginCalculationResultService(DynamicMarginCalculationResultRepository resultRepository) {
-        this.resultRepository = resultRepository;
+    public DynamicMarginCalculationResultService(DynamicMarginCalculationStatusRepository statusRepository) {
+        this.statusRepository = statusRepository;
     }
 
     @Override
     @Transactional
     public void insertStatus(List<UUID> resultUuids, DynamicMarginCalculationStatus status) {
         Objects.requireNonNull(resultUuids);
-        resultRepository.saveAll(resultUuids.stream()
-            .map(uuid -> new DynamicMarginCalculationResultEntity(uuid, status)).toList());
+        statusRepository.saveAll(resultUuids.stream()
+            .map(uuid -> new DynamicMarginCalculationStatusEntity(uuid, status)).toList());
     }
 
     @Transactional
     public List<UUID> updateStatus(List<UUID> resultUuids, DynamicMarginCalculationStatus status) {
-        // find result entities
-        List<DynamicMarginCalculationResultEntity> resultEntities = resultRepository.findAllById(resultUuids);
+        // find status entities
+        List<DynamicMarginCalculationStatusEntity> resultEntities = statusRepository.findAllById(resultUuids);
         // set entity with new values
         resultEntities.forEach(resultEntity -> resultEntity.setStatus(status));
         // save entities into database
-        return resultRepository.saveAllAndFlush(resultEntities).stream().map(DynamicMarginCalculationResultEntity::getId).toList();
+        return statusRepository.saveAllAndFlush(resultEntities).stream().map(DynamicMarginCalculationStatusEntity::getResultUuid).toList();
     }
 
     @Transactional
-    public void updateResult(UUID resultUuid, DynamicMarginCalculationStatus status) {
-        LOGGER.debug("Update dynamic simulation [resultUuid={}, status={}", resultUuid, status);
-        DynamicMarginCalculationResultEntity resultEntity = resultRepository.findById(resultUuid)
+    public void updateStatus(UUID resultUuid, DynamicMarginCalculationStatus status) {
+        LOGGER.debug("Update margin calculation status [resultUuid={}, status={}", resultUuid, status);
+        DynamicMarginCalculationStatusEntity resultEntity = statusRepository.findByResultUuid(resultUuid)
                .orElseThrow(() -> new DynamicMarginCalculationException(RESULT_UUID_NOT_FOUND, MSG_RESULT_UUID_NOT_FOUND + resultUuid));
         resultEntity.setStatus(status);
     }
 
     @Override
+    @Transactional
     public void delete(UUID resultUuid) {
         Objects.requireNonNull(resultUuid);
-        resultRepository.deleteById(resultUuid);
+        statusRepository.deleteByResultUuid(resultUuid);
     }
 
     @Override
     @Transactional
     public void deleteAll() {
-        resultRepository.deleteAll();
+        statusRepository.deleteAll();
     }
 
     @Override
     public DynamicMarginCalculationStatus findStatus(UUID resultUuid) {
         Objects.requireNonNull(resultUuid);
-        return resultRepository.findById(resultUuid)
-            .map(DynamicMarginCalculationResultEntity::getStatus)
+        return statusRepository.findByResultUuid(resultUuid)
+            .map(DynamicMarginCalculationStatusEntity::getStatus)
             .orElse(null);
     }
 }

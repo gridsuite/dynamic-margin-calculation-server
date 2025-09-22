@@ -7,15 +7,20 @@
 
 package org.gridsuite.dynamicmargincalculation.server.repositories;
 
-import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationResultEntity;
+import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @Repository
-public interface DynamicMarginCalculationResultRepository extends JpaRepository<DynamicMarginCalculationResultEntity, UUID> {
+public interface DynamicMarginCalculationStatusRepository extends JpaRepository<DynamicMarginCalculationStatusEntity, UUID> {
+
+    Optional<DynamicMarginCalculationStatusEntity> findByResultUuid(UUID resultUuid);
+
+    void deleteByResultUuid(UUID resultUuid);
 }

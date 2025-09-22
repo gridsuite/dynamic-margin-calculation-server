@@ -9,8 +9,8 @@ package org.gridsuite.dynamicmargincalculation.server.service;
 
 import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
-import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationResultEntity;
-import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationResultRepository;
+import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
+import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -34,30 +34,30 @@ class DynamicMarginCalculationResultServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicMarginCalculationResultServiceTest.class);
 
     @Autowired
-    DynamicMarginCalculationResultRepository resultRepository;
+    DynamicMarginCalculationStatusRepository statusRepository;
 
     @Autowired
     DynamicMarginCalculationResultService dynamicMarginCalculationResultService;
 
     @AfterEach
     void cleanDB() {
-        resultRepository.deleteAll();
+        statusRepository.deleteAll();
     }
 
     @Test
-    void testCrud() {
-        // --- insert an entity in the db --- //
+    void testCrudStatus() {
+        // --- insert a status in the db --- //
         LOGGER.info("Test insert status");
         UUID resultUuid = UUID.randomUUID();
         dynamicMarginCalculationResultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.SUCCEED);
 
-        Optional<DynamicMarginCalculationResultEntity> insertedResultEntityOpt = resultRepository.findById(resultUuid);
+        Optional<DynamicMarginCalculationStatusEntity> insertedResultEntityOpt = statusRepository.findByResultUuid(resultUuid);
         assertThat(insertedResultEntityOpt).isPresent();
         LOGGER.info("Expected result status = {}", DynamicMarginCalculationStatus.SUCCEED);
         LOGGER.info("Actual inserted result status = {}", insertedResultEntityOpt.get().getStatus());
         assertThat(insertedResultEntityOpt.get().getStatus()).isSameAs(DynamicMarginCalculationStatus.SUCCEED);
 
-        // --- get status of the entity -- //
+        // --- get status -- //
         LOGGER.info("Test find status");
         DynamicMarginCalculationStatus status = dynamicMarginCalculationResultService.findStatus(resultUuid);
 
@@ -65,11 +65,11 @@ class DynamicMarginCalculationResultServiceTest {
         LOGGER.info("Actual get result status = {}", insertedResultEntityOpt.get().getStatus());
         assertThat(status).isEqualTo(DynamicMarginCalculationStatus.SUCCEED);
 
-        // --- update the entity --- //
+        // --- update status --- //
         LOGGER.info("Test update status");
         List<UUID> updatedResultUuids = dynamicMarginCalculationResultService.updateStatus(List.of(resultUuid), DynamicMarginCalculationStatus.NOT_DONE);
 
-        Optional<DynamicMarginCalculationResultEntity> updatedResultEntityOpt = resultRepository.findById(updatedResultUuids.getFirst());
+        Optional<DynamicMarginCalculationStatusEntity> updatedResultEntityOpt = statusRepository.findByResultUuid(updatedResultUuids.getFirst());
 
         // status must be changed
         assertThat(updatedResultEntityOpt).isPresent();
@@ -77,36 +77,36 @@ class DynamicMarginCalculationResultServiceTest {
         LOGGER.info("Actual updated result status = {}", updatedResultEntityOpt.get().getStatus());
         assertThat(updatedResultEntityOpt.get().getStatus()).isSameAs(DynamicMarginCalculationStatus.NOT_DONE);
 
-        // --- update entity with non-existing UUID --- //
+        // --- update status entity with non-existing UUID --- //
         LOGGER.info("Test update status with non-existing UUID");
         UUID nonExistingUuid = UUID.randomUUID();
 
         // should throw DynamicMarginCalculationException since the UUID doesn't exist
-        assertThatThrownBy(() -> dynamicMarginCalculationResultService.updateResult(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
+        assertThatThrownBy(() -> dynamicMarginCalculationResultService.updateStatus(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
                 .isInstanceOf(DynamicMarginCalculationException.class)
                 .hasMessageContaining("Result uuid not found: " + nonExistingUuid);
 
         LOGGER.info("Non-existing UUID update threw expected exception");
 
-        // --- delete result --- //
-        LOGGER.info("Test delete a result");
+        // --- delete status --- //
+        LOGGER.info("Test delete a status");
         dynamicMarginCalculationResultService.delete(resultUuid);
 
-        Optional<DynamicMarginCalculationResultEntity> foundResultEntity = resultRepository.findById(resultUuid);
+        Optional<DynamicMarginCalculationStatusEntity> foundResultEntity = statusRepository.findByResultUuid(resultUuid);
         assertThat(foundResultEntity).isNotPresent();
 
-        // --- get status of a deleted entity --- //
+        // --- get the status of a deleted status entity --- //
         status = dynamicMarginCalculationResultService.findStatus(resultUuid);
         assertThat(status).isNull();
 
         // --- delete all --- //
         LOGGER.info("Test delete all results");
-        resultRepository.saveAllAndFlush(List.of(
-                new DynamicMarginCalculationResultEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING),
-                new DynamicMarginCalculationResultEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING)
+        statusRepository.saveAllAndFlush(List.of(
+                new DynamicMarginCalculationStatusEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING),
+                new DynamicMarginCalculationStatusEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING)
         ));
 
         dynamicMarginCalculationResultService.deleteAll();
-        assertThat(resultRepository.findAll()).isEmpty();
+        assertThat(statusRepository.findAll()).isEmpty();
     }
 }

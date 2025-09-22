@@ -7,7 +7,7 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
-import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationResultRepository;
+import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SupervisionService {
-    private final DynamicMarginCalculationResultRepository resultRepository;
+    private final DynamicMarginCalculationStatusRepository statusRepository;
 
-    public SupervisionService(DynamicMarginCalculationResultRepository resultRepository) {
-        this.resultRepository = resultRepository;
+    public SupervisionService(DynamicMarginCalculationStatusRepository statusRepository) {
+        this.statusRepository = statusRepository;
     }
 
     public Integer getResultsCount() {
-        return (int) resultRepository.count();
+        return (int) statusRepository.count();
     }
 }

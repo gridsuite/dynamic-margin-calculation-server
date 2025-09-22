@@ -20,19 +20,19 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@Table(name = "dynamic_margin_calculation_result")
+@Table(name = "dynamic_margin_calculation_status")
 @NoArgsConstructor
 @Entity
-public class DynamicMarginCalculationResultEntity {
+public class DynamicMarginCalculationStatusEntity {
 
-    public DynamicMarginCalculationResultEntity(UUID id, DynamicMarginCalculationStatus status) {
-        this.id = id;
+    public DynamicMarginCalculationStatusEntity(UUID resultUuid, DynamicMarginCalculationStatus status) {
+        this.resultUuid = resultUuid;
         this.status = status;
     }
 
     @Id
     @Column(name = "result_uuid")
-    private UUID id;
+    private UUID resultUuid;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
