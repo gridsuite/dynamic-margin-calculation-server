@@ -22,7 +22,7 @@ public class RestResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 
     @ExceptionHandler(DynamicMarginCalculationException.class)
-    protected ResponseEntity<Object> handleDynamicSecurityAnalysisException(DynamicMarginCalculationException exception) {
+    protected ResponseEntity<Object> handleDynamicMarginCalculationException(DynamicMarginCalculationException exception) {
         if (LOGGER.isErrorEnabled()) {
             LOGGER.error(exception.getMessage(), exception);
         }

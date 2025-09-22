@@ -37,7 +37,7 @@ class DynamicMarginCalculationResultServiceTest {
     DynamicMarginCalculationResultRepository resultRepository;
 
     @Autowired
-    DynamicMarginCalculationResultService dynamicSecurityAnalysisResultService;
+    DynamicMarginCalculationResultService dynamicMarginCalculationResultService;
 
     @AfterEach
     void cleanDB() {
@@ -49,7 +49,7 @@ class DynamicMarginCalculationResultServiceTest {
         // --- insert an entity in the db --- //
         LOGGER.info("Test insert status");
         UUID resultUuid = UUID.randomUUID();
-        dynamicSecurityAnalysisResultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.SUCCEED);
+        dynamicMarginCalculationResultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.SUCCEED);
 
         Optional<DynamicMarginCalculationResultEntity> insertedResultEntityOpt = resultRepository.findById(resultUuid);
         assertThat(insertedResultEntityOpt).isPresent();
@@ -59,7 +59,7 @@ class DynamicMarginCalculationResultServiceTest {
 
         // --- get status of the entity -- //
         LOGGER.info("Test find status");
-        DynamicMarginCalculationStatus status = dynamicSecurityAnalysisResultService.findStatus(resultUuid);
+        DynamicMarginCalculationStatus status = dynamicMarginCalculationResultService.findStatus(resultUuid);
 
         LOGGER.info("Expected result status = {}", DynamicMarginCalculationStatus.SUCCEED);
         LOGGER.info("Actual get result status = {}", insertedResultEntityOpt.get().getStatus());
@@ -67,9 +67,9 @@ class DynamicMarginCalculationResultServiceTest {
 
         // --- update the entity --- //
         LOGGER.info("Test update status");
-        List<UUID> updatedResultUuids = dynamicSecurityAnalysisResultService.updateStatus(List.of(resultUuid), DynamicMarginCalculationStatus.NOT_DONE);
+        List<UUID> updatedResultUuids = dynamicMarginCalculationResultService.updateStatus(List.of(resultUuid), DynamicMarginCalculationStatus.NOT_DONE);
 
-        Optional<DynamicMarginCalculationResultEntity> updatedResultEntityOpt = resultRepository.findById(updatedResultUuids.get(0));
+        Optional<DynamicMarginCalculationResultEntity> updatedResultEntityOpt = resultRepository.findById(updatedResultUuids.getFirst());
 
         // status must be changed
         assertThat(updatedResultEntityOpt).isPresent();
@@ -82,7 +82,7 @@ class DynamicMarginCalculationResultServiceTest {
         UUID nonExistingUuid = UUID.randomUUID();
 
         // should throw DynamicMarginCalculationException since the UUID doesn't exist
-        assertThatThrownBy(() -> dynamicSecurityAnalysisResultService.updateResult(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
+        assertThatThrownBy(() -> dynamicMarginCalculationResultService.updateResult(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
                 .isInstanceOf(DynamicMarginCalculationException.class)
                 .hasMessageContaining("Result uuid not found: " + nonExistingUuid);
 
@@ -90,13 +90,13 @@ class DynamicMarginCalculationResultServiceTest {
 
         // --- delete result --- //
         LOGGER.info("Test delete a result");
-        dynamicSecurityAnalysisResultService.delete(resultUuid);
+        dynamicMarginCalculationResultService.delete(resultUuid);
 
         Optional<DynamicMarginCalculationResultEntity> foundResultEntity = resultRepository.findById(resultUuid);
         assertThat(foundResultEntity).isNotPresent();
 
         // --- get status of a deleted entity --- //
-        status = dynamicSecurityAnalysisResultService.findStatus(resultUuid);
+        status = dynamicMarginCalculationResultService.findStatus(resultUuid);
         assertThat(status).isNull();
 
         // --- delete all --- //
@@ -106,7 +106,7 @@ class DynamicMarginCalculationResultServiceTest {
                 new DynamicMarginCalculationResultEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING)
         ));
 
-        dynamicSecurityAnalysisResultService.deleteAll();
+        dynamicMarginCalculationResultService.deleteAll();
         assertThat(resultRepository.findAll()).isEmpty();
     }
 }
