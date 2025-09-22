@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: dynamic-margin-calculation-server
+
+  cloud:
+    function:
+      definition: consumeRun;consumeCancel
+    stream:
+      bindings:
+        consumeRun-in-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.run
+          group: dmcGroup
+          consumer:
+            concurrency: 2
+            max-attempts: 1
+        publishRun-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.run
+        publishResult-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.result
+        consumeCancel-in-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.cancel
+        publishCancel-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.cancel
+        publishStopped-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.stopped
+        publishCancelFailed-out-0:
+          destination: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.cancelfailed
+      output-bindings: publishRun-out-0;publishResult-out-0;publishCancel-out-0;publishStopped-out-0;publishCancelFailed-out-0
+      rabbit:
+        bindings:
+          consumeRun-in-0:
+            consumer:
+              auto-bind-dlq: true
+              dead-letter-exchange: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.run.dlx
+              dead-letter-queue-name: ${powsybl-ws.rabbitmq.destination.prefix:}dmc.run.dlx.dlq
+              dead-letter-exchange-type: topic
+              quorum:
+                enabled: true
+                delivery-limit: 2
+
+powsybl-ws:
+  database:
+    name: dynamicmargincalculation
+
+# default values for dynamic margin calculation providers is "Dynawo"
+dynamic-margin-calculation:
+  default-provider: Dynawo
