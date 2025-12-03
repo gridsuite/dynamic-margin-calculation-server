@@ -7,7 +7,8 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
-import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
+import org.gridsuite.computation.error.ComputationException;
+import org.gridsuite.dynamicmargincalculation.server.PropertyServerNameProvider;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @SpringBootTest
+@Import(PropertyServerNameProvider.class)
 class DynamicMarginCalculationResultServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicMarginCalculationResultServiceTest.class);
@@ -83,7 +86,7 @@ class DynamicMarginCalculationResultServiceTest {
 
         // should throw DynamicMarginCalculationException since the UUID doesn't exist
         assertThatThrownBy(() -> dynamicMarginCalculationResultService.updateStatus(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
-                .isInstanceOf(DynamicMarginCalculationException.class)
+                .isInstanceOf(ComputationException.class)
                 .hasMessageContaining("Result uuid not found: " + nonExistingUuid);
 
         LOGGER.info("Non-existing UUID update threw expected exception");
