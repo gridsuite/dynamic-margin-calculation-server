@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
-@SpringBootApplication(scanBasePackageClasses = { ComputationExceptionHandler.class})
+@SpringBootApplication(scanBasePackageClasses = { DynamicMarginCalculationApplication.class, ComputationExceptionHandler.class})
 public class DynamicMarginCalculationApplication {
 
     public static void main(String[] args) {
