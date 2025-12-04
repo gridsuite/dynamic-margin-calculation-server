@@ -8,8 +8,8 @@
 package org.gridsuite.dynamicmargincalculation.server.service;
 
 import jakarta.transaction.Transactional;
+import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.computation.service.AbstractComputationResultService;
-import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException.Type.RESULT_UUID_NOT_FOUND;
+import static org.gridsuite.computation.error.ComputationBusinessErrorCode.RESULT_NOT_FOUND;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -60,7 +60,7 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
     public void updateStatus(UUID resultUuid, DynamicMarginCalculationStatus status) {
         LOGGER.debug("Update margin calculation status [resultUuid={}, status={}", resultUuid, status);
         DynamicMarginCalculationStatusEntity resultEntity = statusRepository.findByResultUuid(resultUuid)
-               .orElseThrow(() -> new DynamicMarginCalculationException(RESULT_UUID_NOT_FOUND, MSG_RESULT_UUID_NOT_FOUND + resultUuid));
+               .orElseThrow(() -> new ComputationException(RESULT_NOT_FOUND, MSG_RESULT_UUID_NOT_FOUND + resultUuid));
         resultEntity.setStatus(status);
     }
 
