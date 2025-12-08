@@ -7,7 +7,7 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
-import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationException;
+import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
@@ -83,7 +83,7 @@ class DynamicMarginCalculationResultServiceTest {
 
         // should throw DynamicMarginCalculationException since the UUID doesn't exist
         assertThatThrownBy(() -> dynamicMarginCalculationResultService.updateStatus(nonExistingUuid, DynamicMarginCalculationStatus.FAILED))
-                .isInstanceOf(DynamicMarginCalculationException.class)
+                .isInstanceOf(ComputationException.class)
                 .hasMessageContaining("Result uuid not found: " + nonExistingUuid);
 
         LOGGER.info("Non-existing UUID update threw expected exception");
