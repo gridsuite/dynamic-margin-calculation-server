@@ -48,7 +48,7 @@
         <sonar.organization>gridsuite</sonar.organization>
         <sonar.projectKey>org.gridsuite:dynamic-margin-calculation-server</sonar.projectKey>
         <!-- To remove after when using gridsuite dependencies release and computation version containing merged PR: https://github.com/gridsuite/computation/pull/19 -->
-        <gridsuite-computation.version>1.7.0</gridsuite-computation.version>
+        <gridsuite-computation.version>1.9.0</gridsuite-computation.version>
         <powsybl-ws-commons.version>1.34.0</powsybl-ws-commons.version>
     </properties>
 
@@ -117,10 +117,6 @@
     <dependencies>
         <!-- Compilation dependencies -->
         <dependency>
-            <groupId>org.gridsuite</groupId>
-            <artifactId>gridsuite-computation</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -160,6 +156,15 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-dynawo-margin-calculation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.gridsuite</groupId>
+            <artifactId>gridsuite-computation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gridsuite</groupId>
+            <artifactId>gridsuite-filter</artifactId>
         </dependency>
 
         <!-- runtime dependencies -->

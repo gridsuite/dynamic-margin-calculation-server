@@ -7,12 +7,15 @@
 
 package org.gridsuite.dynamicmargincalculation.server.service;
 
+import com.powsybl.dynawo.margincalculation.results.MarginCalculationResult;
 import jakarta.transaction.Transactional;
 import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.computation.service.AbstractComputationResultService;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
+import org.gridsuite.dynamicmargincalculation.server.entities.result.MarginCalculationResultEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
+import org.gridsuite.dynamicmargincalculation.server.repositories.MarginCalculationResultRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,9 +36,12 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
     public static final String MSG_RESULT_UUID_NOT_FOUND = "Result uuid not found: ";
 
     private final DynamicMarginCalculationStatusRepository statusRepository;
+    private final MarginCalculationResultRepository resultRepository;
 
-    public DynamicMarginCalculationResultService(DynamicMarginCalculationStatusRepository statusRepository) {
+    public DynamicMarginCalculationResultService(DynamicMarginCalculationStatusRepository statusRepository,
+                                                 MarginCalculationResultRepository resultRepository) {
         this.statusRepository = statusRepository;
+        this.resultRepository = resultRepository;
     }
 
     @Override
@@ -56,12 +62,16 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
         return statusRepository.saveAllAndFlush(resultEntities).stream().map(DynamicMarginCalculationStatusEntity::getResultUuid).toList();
     }
 
-    @Transactional
-    public void updateStatus(UUID resultUuid, DynamicMarginCalculationStatus status) {
+    private void internalUpdateStatus(UUID resultUuid, DynamicMarginCalculationStatus status) {
         LOGGER.debug("Update margin calculation status [resultUuid={}, status={}", resultUuid, status);
         DynamicMarginCalculationStatusEntity resultEntity = statusRepository.findByResultUuid(resultUuid)
                .orElseThrow(() -> new ComputationException(RESULT_NOT_FOUND, MSG_RESULT_UUID_NOT_FOUND + resultUuid));
         resultEntity.setStatus(status);
+    }
+
+    @Transactional
+    public void updateStatus(UUID resultUuid, DynamicMarginCalculationStatus status) {
+        internalUpdateStatus(resultUuid, status);
     }
 
     @Override
@@ -69,12 +79,14 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
     public void delete(UUID resultUuid) {
         Objects.requireNonNull(resultUuid);
         statusRepository.deleteByResultUuid(resultUuid);
+        resultRepository.deleteByResultUuid(resultUuid);
     }
 
     @Override
     @Transactional
     public void deleteAll() {
         statusRepository.deleteAll();
+        resultRepository.deleteAll();
     }
 
     @Override
@@ -83,5 +95,12 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
         return statusRepository.findByResultUuid(resultUuid)
             .map(DynamicMarginCalculationStatusEntity::getStatus)
             .orElse(null);
+    }
+
+    @Transactional
+    public void insertResult(UUID resultUuid, MarginCalculationResult result, DynamicMarginCalculationStatus status) {
+        internalUpdateStatus(resultUuid, status);
+        MarginCalculationResultEntity resultEntity = MarginCalculationResultEntity.fromDomain(resultUuid, result);
+        resultRepository.save(resultEntity);
     }
 }

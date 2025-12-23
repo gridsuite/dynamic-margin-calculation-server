@@ -16,7 +16,11 @@ powsybl:
 
 gridsuite:
   services:
-    dynamic-mapping-server:
-      base-uri: http://localhost:5036
+    filter-server:
+      base-uri: http://localhost:5027
     report-server:
       base-uri: http://localhost:5028
+    dynamic-simulation-server:
+      base-uri: http://localhost:5032
+    dynamic-security-analysis-server:
+      base-uri: http://localhost:5040
