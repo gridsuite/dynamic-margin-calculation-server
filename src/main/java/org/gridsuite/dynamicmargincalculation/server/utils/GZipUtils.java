@@ -36,6 +36,7 @@ public final class GZipUtils {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              GZIPOutputStream gzip = new GZIPOutputStream(out)) {
             gzip.write(str.getBytes(StandardCharsets.UTF_8));
+            gzip.finish();
             return Base64.getEncoder().encodeToString(out.toByteArray());
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to compress string", e);

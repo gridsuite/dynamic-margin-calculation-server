@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.UUID;
 
+import static org.gridsuite.computation.service.AbstractResultContext.VARIANT_ID_HEADER;
 import static org.gridsuite.dynamicmargincalculation.server.service.client.utils.UrlUtils.buildEndPointUrl;
 
 /**
@@ -42,7 +43,7 @@ public class DynamicSecurityAnalysisClient extends AbstractRestClient {
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString(endPointUrl + "/{parametersUuid}/values")
                 .queryParam("networkUuid", networkUuid)
-                .queryParam("variant", variant)
+                .queryParam(VARIANT_ID_HEADER, variant)
                 .buildAndExpand(dynamicSecurityAnalysisParametersUuid);
 
         // call dynamic security analysis REST API

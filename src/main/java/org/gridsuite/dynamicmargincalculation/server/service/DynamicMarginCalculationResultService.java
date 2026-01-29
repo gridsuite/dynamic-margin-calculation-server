@@ -8,7 +8,6 @@
 package org.gridsuite.dynamicmargincalculation.server.service;
 
 import com.powsybl.dynawo.margincalculation.results.MarginCalculationResult;
-import jakarta.transaction.Transactional;
 import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.computation.service.AbstractComputationResultService;
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
@@ -19,6 +18,7 @@ import org.gridsuite.dynamicmargincalculation.server.repositories.MarginCalculat
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -76,6 +76,15 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
 
     @Override
     @Transactional
+    public void saveDebugFileLocation(UUID resultUuid, String debugFilePath) {
+        statusRepository.findById(resultUuid).ifPresentOrElse(
+                (var resultEntity) -> statusRepository.updateDebugFileLocation(resultUuid, debugFilePath),
+                () -> statusRepository.save(new DynamicMarginCalculationStatusEntity(resultUuid, DynamicMarginCalculationStatus.NOT_DONE, debugFilePath))
+        );
+    }
+
+    @Override
+    @Transactional
     public void delete(UUID resultUuid) {
         Objects.requireNonNull(resultUuid);
         statusRepository.deleteByResultUuid(resultUuid);
@@ -103,4 +112,14 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
         MarginCalculationResultEntity resultEntity = MarginCalculationResultEntity.fromDomain(resultUuid, result);
         resultRepository.save(resultEntity);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String findDebugFileLocation(UUID resultUuid) {
+        Objects.requireNonNull(resultUuid);
+        return statusRepository.findById(resultUuid)
+                .map(DynamicMarginCalculationStatusEntity::getDebugFileLocation)
+                .orElse(null);
+    }
+
 }

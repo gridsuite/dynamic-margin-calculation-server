@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
-    <changeSet author="phamquy (generated)" id="1766483463304-1">
+    <changeSet author="phamquy (generated)" id="1769711751679-1">
         <createTable tableName="dynamic_margin_calculation_parameters">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="dynamic_margin_calculation_parametersPK"/>
@@ -16,14 +16,14 @@
             <column name="stop_time" type="FLOAT(53)"/>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-2">
+    <changeSet author="phamquy (generated)" id="1769711751679-2">
         <createTable tableName="dynamic_margin_calculation_result">
             <column name="result_uuid" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="dynamic_margin_calculation_resultPK"/>
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-3">
+    <changeSet author="phamquy (generated)" id="1769711751679-3">
         <createTable tableName="load_increase_result">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="load_increase_resultPK"/>
@@ -34,7 +34,7 @@
             <column name="pos" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-4">
+    <changeSet author="phamquy (generated)" id="1769711751679-4">
         <createTable tableName="load_increase_result_failed_criteria">
             <column name="load_increase_result_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="load_increase_result_failed_criteriaPK"/>
@@ -46,7 +46,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-5">
+    <changeSet author="phamquy (generated)" id="1769711751679-5">
         <createTable tableName="loads_variation">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="loads_variationPK"/>
@@ -56,7 +56,7 @@
             <column name="pos" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-6">
+    <changeSet author="phamquy (generated)" id="1769711751679-6">
         <createTable tableName="loads_variation_load_filter">
             <column name="loads_variation_id" type="UUID">
                 <constraints nullable="false"/>
@@ -66,7 +66,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-7">
+    <changeSet author="phamquy (generated)" id="1769711751679-7">
         <createTable tableName="scenario_result">
             <column name="id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="scenario_resultPK"/>
@@ -77,7 +77,7 @@
             <column name="pos" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-8">
+    <changeSet author="phamquy (generated)" id="1769711751679-8">
         <createTable tableName="scenario_result_failed_criteria">
             <column name="scenario_result_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="scenario_result_failed_criteriaPK"/>
@@ -89,42 +89,47 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-9">
+    <changeSet author="phamquy (generated)" id="1769711751679-9">
+        <addColumn tableName="dynamic_margin_calculation_status">
+            <column name="debug_file_location" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1769711751679-10">
         <createIndex indexName="load_increase_result_failed_criteria_idx" tableName="load_increase_result_failed_criteria">
             <column name="load_increase_result_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-10">
+    <changeSet author="phamquy (generated)" id="1769711751679-11">
         <createIndex indexName="load_increase_result_idx" tableName="load_increase_result">
             <column name="dynamic_margin_calculation_result_uuid"/>
         </createIndex>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-11">
+    <changeSet author="phamquy (generated)" id="1769711751679-12">
         <createIndex indexName="scenario_result_failed_criteria_idx" tableName="scenario_result_failed_criteria">
             <column name="scenario_result_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-12">
+    <changeSet author="phamquy (generated)" id="1769711751679-13">
         <createIndex indexName="scenario_result_idx" tableName="scenario_result">
             <column name="load_increase_result_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-13">
+    <changeSet author="phamquy (generated)" id="1769711751679-14">
         <addForeignKeyConstraint baseColumnNames="dynamic_margin_calculation_parameters_id" baseTableName="loads_variation" constraintName="dynamic_margin_calculation_parameters_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="dynamic_margin_calculation_parameters" validate="true"/>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-14">
+    <changeSet author="phamquy (generated)" id="1769711751679-15">
         <addForeignKeyConstraint baseColumnNames="dynamic_margin_calculation_result_uuid" baseTableName="load_increase_result" constraintName="load_increase_result_dynamic_margin_calculation_result_uuid_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="result_uuid" referencedTableName="dynamic_margin_calculation_result" validate="true"/>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-15">
+    <changeSet author="phamquy (generated)" id="1769711751679-16">
         <addForeignKeyConstraint baseColumnNames="load_increase_result_id" baseTableName="load_increase_result_failed_criteria" constraintName="load_increase_result_failed_criteria_load_increase_result_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="load_increase_result" validate="true"/>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-16">
+    <changeSet author="phamquy (generated)" id="1769711751679-17">
         <addForeignKeyConstraint baseColumnNames="loads_variation_id" baseTableName="loads_variation_load_filter" constraintName="loads_variation_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="loads_variation" validate="true"/>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-17">
+    <changeSet author="phamquy (generated)" id="1769711751679-18">
         <addForeignKeyConstraint baseColumnNames="scenario_result_id" baseTableName="scenario_result_failed_criteria" constraintName="scenario_result_failed_criteria_scenario_result_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="scenario_result" validate="true"/>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1766483463304-18">
+    <changeSet author="phamquy (generated)" id="1769711751679-19">
         <addForeignKeyConstraint baseColumnNames="load_increase_result_id" baseTableName="scenario_result" constraintName="scenario_result_load_increase_result_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="load_increase_result" validate="true"/>
     </changeSet>
 </databaseChangeLog>

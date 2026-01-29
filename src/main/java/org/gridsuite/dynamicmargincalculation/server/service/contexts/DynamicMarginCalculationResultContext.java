@@ -75,7 +75,7 @@ public class DynamicMarginCalculationResultContext extends AbstractResultContext
         UUID dynamicSecurityAnalysisParametersUuid = UUID.fromString(getNonNullHeader(headers, HEADER_DYNAMIC_SECURITY_ANALYSIS_PARAMETERS_UUID));
         runContext.setDynamicSecurityAnalysisParametersUuid(dynamicSecurityAnalysisParametersUuid);
         // TODO : using directly uuid after moving dynamic simulation parameters to its server
-        String compressedJson = getNonNullHeader(headers, HEADER_DYNAMIC_SIMULATION_PARAMETERS_JSON_UUID);
+        String compressedJson = headers.get(HEADER_DYNAMIC_SIMULATION_PARAMETERS_JSON_UUID).toString();
         runContext.setDynamicSimulationParametersJson(GZipUtils.decompress(compressedJson));
 
         return new DynamicMarginCalculationResultContext(resultUuid, runContext);

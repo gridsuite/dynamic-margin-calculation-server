@@ -8,6 +8,7 @@
 package org.gridsuite.dynamicmargincalculation.server.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @Setter
 @Table(name = "dynamic_margin_calculation_status")
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class DynamicMarginCalculationStatusEntity {
 
@@ -37,5 +39,8 @@ public class DynamicMarginCalculationStatusEntity {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private DynamicMarginCalculationStatus status;
+
+    @Column(name = "debugFileLocation")
+    private String debugFileLocation;
 
 }

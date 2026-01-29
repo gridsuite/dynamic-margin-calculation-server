@@ -12,6 +12,7 @@ import com.powsybl.dynawo.margincalculation.loadsvariation.LoadsVariation;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import jakarta.transaction.Transactional;
+import org.apache.commons.collections4.CollectionUtils;
 import org.gridsuite.computation.dto.ReportInfos;
 import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMarginCalculationParametersInfos;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -108,20 +110,14 @@ public class ParametersService {
         DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
 
-        return DynamicMarginCalculationParametersInfos.builder()
-                .id(parametersUuid)
-                .provider(entity.getProvider())
-                .startTime(entity.getStartTime())
-                .stopTime(entity.getStopTime())
-                .marginCalculationStartTime(entity.getMarginCalculationStartTime())
-                .calculationType(entity.getCalculationType())
-                .build();
+        return entity.toDto(false);
     }
 
     public UUID createParameters(DynamicMarginCalculationParametersInfos parametersInfos) {
         return dynamicMarginCalculationParametersRepository.save(new DynamicMarginCalculationParametersEntity(parametersInfos)).getId();
     }
 
+    @Transactional
     public UUID createDefaultParameters() {
         DynamicMarginCalculationParametersInfos defaultParametersInfos = getDefaultParametersValues(defaultProvider);
         return createParameters(defaultParametersInfos);
@@ -181,6 +177,10 @@ public class ParametersService {
     }
 
     public List<LoadsVariation> getLoadsVariations(List<LoadsVariationInfos> loadsVariationInfosList, Network network) {
+        if (CollectionUtils.isEmpty(loadsVariationInfosList)) {
+            return Collections.emptyList();
+        }
+
         List<LoadsVariation> loadsVariations = loadsVariationInfosList.stream().map(loadsVariationInfos -> {
             // build as a unique IS_PART_OF expert-filter then evaluate
             ExpertFilter filter = ExpertFilter.builder()

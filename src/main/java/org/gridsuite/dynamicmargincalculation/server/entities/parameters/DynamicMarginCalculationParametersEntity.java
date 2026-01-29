@@ -13,6 +13,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMarginCalculationParametersInfos;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.LoadsVariationInfos;
 
@@ -34,7 +35,6 @@ import static jakarta.persistence.CascadeType.ALL;
 @Table(name = "dynamic_margin_calculation_parameters")
 public class DynamicMarginCalculationParametersEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
@@ -95,6 +95,9 @@ public class DynamicMarginCalculationParametersEntity {
     }
 
     private void assignLoadsVariations(List<LoadsVariationInfos> loadsVariationInfosList) {
+        if (CollectionUtils.isEmpty(loadsVariationInfosList)) {
+            return;
+        }
         // build existing loads variation Map
         Map<UUID, LoadsVariationEntity> loadsVariationsByIdMap = loadsVariations.stream().collect(Collectors.toMap(LoadsVariationEntity::getId, loadVariationEntity -> loadVariationEntity));
 

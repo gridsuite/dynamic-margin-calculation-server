@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.powsybl.commons.report.ReportNodeJsonModule;
+import com.powsybl.dynamicsimulation.json.DynamicSimulationParametersJsonModule;
 import com.powsybl.dynawo.margincalculation.json.MarginCalculationParametersJsonModule;
+import com.powsybl.security.dynamic.json.DynamicSecurityAnalysisJsonModule;
 import org.gridsuite.computation.ComputationConfig;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -40,6 +42,7 @@ public class RestTemplateConfig {
         return builder -> builder
                 .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-                .modulesToInstall(new MarginCalculationParametersJsonModule(), new ReportNodeJsonModule());
+                .modulesToInstall(new MarginCalculationParametersJsonModule(), new DynamicSecurityAnalysisJsonModule(),
+                        new DynamicSimulationParametersJsonModule(), new ReportNodeJsonModule());
     }
 }

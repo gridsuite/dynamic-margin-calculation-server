@@ -143,7 +143,16 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-dynawo-margin-calculation</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-dynawo-contingencies</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-dynamic-security-analysis</artifactId>
+            <version>7.1.1</version>
+        </dependency>
         <dependency>
             <groupId>org.gridsuite</groupId>
             <artifactId>gridsuite-computation</artifactId>
