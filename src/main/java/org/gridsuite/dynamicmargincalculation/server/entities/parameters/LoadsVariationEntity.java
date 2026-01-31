@@ -41,6 +41,8 @@ public class LoadsVariationEntity {
 
     private Double variation;
 
+    private Boolean active; // means this variation is used in calculation
+
     LoadsVariationEntity(LoadsVariationInfos loadsVariationInfos) {
         assignAttributes(loadsVariationInfos);
     }
@@ -51,6 +53,7 @@ public class LoadsVariationEntity {
             loadsVariationInfos.setId(id);
         }
         variation = loadsVariationInfos.getVariation();
+        active = loadsVariationInfos.getActive();
         loadFilterIds = loadsVariationInfos.getLoadFilterUuids();
     }
 
@@ -62,6 +65,7 @@ public class LoadsVariationEntity {
         return LoadsVariationInfos.builder()
                 .id(toDuplicate ? null : id)
                 .variation(variation)
+                .active(active)
                 .loadFilterUuids(loadFilterIds)
                 .build();
     }

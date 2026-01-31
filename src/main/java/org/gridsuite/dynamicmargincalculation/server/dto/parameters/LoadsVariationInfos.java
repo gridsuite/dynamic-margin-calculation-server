@@ -32,4 +32,7 @@ public class LoadsVariationInfos {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double variation;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Boolean active;
 }
