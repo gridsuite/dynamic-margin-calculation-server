@@ -74,6 +74,10 @@ public class ParametersService {
 
         // get parameters from the local database
         DynamicMarginCalculationParametersInfos dynamicMarginCalculationParametersInfos = getParameters(dynamicMarginCalculationParametersUuid);
+        // take only active load variations
+        dynamicMarginCalculationParametersInfos.setLoadsVariations(dynamicMarginCalculationParametersInfos.getLoadsVariations()
+            .stream()
+            .filter(LoadsVariationInfos::getActive).toList());
 
         // build run context
         DynamicMarginCalculationRunContext runContext = DynamicMarginCalculationRunContext.builder()
