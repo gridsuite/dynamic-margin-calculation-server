@@ -9,6 +9,7 @@ package org.gridsuite.dynamicmargincalculation.server.entities.parameters;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.gridsuite.dynamicmargincalculation.server.dto.parameters.IdNameInfos;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.LoadsVariationInfos;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class LoadsVariationEntity {
         }
         variation = loadsVariationInfos.getVariation();
         active = loadsVariationInfos.getActive();
-        loadFilterIds = loadsVariationInfos.getLoadFilterUuids();
+        loadFilterIds = loadsVariationInfos.getLoadFilters().stream().map(IdNameInfos::getId).toList();
     }
 
     void update(LoadsVariationInfos loadsVariationInfos) {
@@ -66,7 +67,7 @@ public class LoadsVariationEntity {
                 .id(toDuplicate ? null : id)
                 .variation(variation)
                 .active(active)
-                .loadFilterUuids(loadFilterIds)
+                .loadFilters(loadFilterIds.stream().map(loadFilterId -> new IdNameInfos(loadFilterId, null)).toList())
                 .build();
     }
 }

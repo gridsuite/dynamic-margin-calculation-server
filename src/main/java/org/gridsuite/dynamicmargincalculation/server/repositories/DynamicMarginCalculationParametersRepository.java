@@ -9,8 +9,11 @@ package org.gridsuite.dynamicmargincalculation.server.repositories;
 
 import org.gridsuite.dynamicmargincalculation.server.entities.parameters.DynamicMarginCalculationParametersEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -18,4 +21,7 @@ import java.util.UUID;
  */
 @Repository
 public interface DynamicMarginCalculationParametersRepository extends JpaRepository<DynamicMarginCalculationParametersEntity, UUID> {
+
+    @Query("SELECT params.provider FROM DynamicMarginCalculationParametersEntity params WHERE params.id = :id")
+    Optional<String> findProviderById(@Param("id") UUID id);
 }

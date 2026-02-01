@@ -18,8 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+
+import static org.gridsuite.computation.service.NotificationService.HEADER_USER_ID;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -55,7 +56,7 @@ public class DynamicMarginCalculationParametersController {
     @ApiResponse(responseCode = "200", description = "parameters were duplicated")
     public ResponseEntity<UUID> duplicateParameters(
             @Parameter(description = "source parameters UUID") @RequestParam("duplicateFrom") UUID sourceParametersUuid) {
-        return ResponseEntity.of(Optional.of(parametersService.duplicateParameters(sourceParametersUuid)));
+        return ResponseEntity.ok(parametersService.duplicateParameters(sourceParametersUuid));
     }
 
     @GetMapping(value = "/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,8 +64,9 @@ public class DynamicMarginCalculationParametersController {
     @ApiResponse(responseCode = "200", description = "parameters were returned")
     @ApiResponse(responseCode = "404", description = "parameters were not found")
     public ResponseEntity<DynamicMarginCalculationParametersInfos> getParameters(
-            @Parameter(description = "parameters UUID") @PathVariable("uuid") UUID parametersUuid) {
-        return ResponseEntity.of(Optional.of(parametersService.getParameters(parametersUuid)));
+            @Parameter(description = "parameters UUID") @PathVariable("uuid") UUID parametersUuid,
+            @RequestHeader(HEADER_USER_ID) String userId) {
+        return ResponseEntity.ok(parametersService.getParameters(parametersUuid, userId));
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,7 +101,7 @@ public class DynamicMarginCalculationParametersController {
     @ApiResponse(responseCode = "404", description = "provider were not found")
     public ResponseEntity<String> getProvider(
             @Parameter(description = "parameters UUID") @PathVariable("uuid") UUID parametersUuid) {
-        return ResponseEntity.of(Optional.of(parametersService.getParameters(parametersUuid).getProvider()));
+        return ResponseEntity.ok(parametersService.getProvider(parametersUuid));
     }
 
     @PutMapping(value = "/{uuid}/provider")

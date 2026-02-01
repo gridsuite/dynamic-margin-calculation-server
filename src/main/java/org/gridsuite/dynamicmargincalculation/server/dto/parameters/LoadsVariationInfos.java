@@ -28,7 +28,7 @@ public class LoadsVariationInfos {
     private UUID id;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<UUID> loadFilterUuids;
+    private List<IdNameInfos> loadFilters;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Double variation;

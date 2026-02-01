@@ -40,7 +40,7 @@ public class DynamicMarginCalculationExceptionHandler extends AbstractBusinessEx
     }
 
     @ExceptionHandler(DynamicMarginCalculationException.class)
-    public ResponseEntity<PowsyblWsProblemDetail> handleDynamicSecurityAnalysisException(DynamicMarginCalculationException exception, HttpServletRequest request) {
+    public ResponseEntity<PowsyblWsProblemDetail> handleDynamicMarginCalculationException(DynamicMarginCalculationException exception, HttpServletRequest request) {
         return super.handleDomainException(exception, request);
     }
 

@@ -13,13 +13,16 @@ import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import jakarta.transaction.Transactional;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.computation.dto.ReportInfos;
 import org.gridsuite.computation.error.ComputationException;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMarginCalculationParametersInfos;
+import org.gridsuite.dynamicmargincalculation.server.dto.parameters.IdNameInfos;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.LoadsVariationInfos;
 import org.gridsuite.dynamicmargincalculation.server.entities.parameters.DynamicMarginCalculationParametersEntity;
 import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationParametersRepository;
+import org.gridsuite.dynamicmargincalculation.server.service.client.DirectoryClient;
 import org.gridsuite.dynamicmargincalculation.server.service.client.FilterClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationRunContext;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
@@ -32,10 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.computation.error.ComputationBusinessErrorCode.PARAMETERS_NOT_FOUND;
@@ -53,14 +53,18 @@ public class ParametersService {
 
     private final DynamicMarginCalculationParametersRepository dynamicMarginCalculationParametersRepository;
 
+    private final DirectoryClient directoryClient;
+
     private final FilterClient filterClient;
 
     @Autowired
     public ParametersService(@Value("${dynamic-margin-calculation.default-provider}") String defaultProvider,
                              DynamicMarginCalculationParametersRepository dynamicMarginCalculationParametersRepository,
+                             DirectoryClient directoryClient,
                              FilterClient filterClient) {
         this.defaultProvider = defaultProvider;
         this.dynamicMarginCalculationParametersRepository = dynamicMarginCalculationParametersRepository;
+        this.directoryClient = directoryClient;
         this.filterClient = filterClient;
     }
 
@@ -73,7 +77,7 @@ public class ParametersService {
            boolean debug) {
 
         // get parameters from the local database
-        DynamicMarginCalculationParametersInfos dynamicMarginCalculationParametersInfos = getParameters(dynamicMarginCalculationParametersUuid);
+        DynamicMarginCalculationParametersInfos dynamicMarginCalculationParametersInfos = getParameters(dynamicMarginCalculationParametersUuid, null);
         // take only active load variations
         dynamicMarginCalculationParametersInfos.setLoadsVariations(dynamicMarginCalculationParametersInfos.getLoadsVariations()
             .stream()
@@ -110,11 +114,33 @@ public class ParametersService {
 
     // --- Dynamic security analysis parameters related methods --- //
 
-    public DynamicMarginCalculationParametersInfos getParameters(UUID parametersUuid) {
+    public DynamicMarginCalculationParametersInfos getParameters(UUID parametersUuid, String userId) {
         DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
 
-        return entity.toDto(false);
+        DynamicMarginCalculationParametersInfos parameters = entity.toDto(false);
+
+        // enrich parameters with names of directory elements inside parameters if userId is provided
+        if (StringUtils.isNotBlank(userId)) {
+            Map<UUID, String> elementsUuidToName = directoryClient.getElementNames(
+                    parameters.getLoadsVariations().stream()
+                            .flatMap(elem -> elem.getLoadFilters().stream().map(IdNameInfos::getId))
+                            .distinct().toList(),
+                    userId);
+            // enrich load filters with name
+            parameters.getLoadsVariations().forEach(loadsVariation ->
+                loadsVariation.getLoadFilters().forEach(loadFilter ->
+                    loadFilter.setName(elementsUuidToName.get(loadFilter.getId())))
+            );
+            parameters.setElementsUuidToName(elementsUuidToName);
+        }
+
+        return parameters;
+    }
+
+    public String getProvider(UUID parametersUuid) {
+        return dynamicMarginCalculationParametersRepository.findProviderById(parametersUuid)
+                .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
     }
 
     public UUID createParameters(DynamicMarginCalculationParametersInfos parametersInfos) {
@@ -188,13 +214,15 @@ public class ParametersService {
         List<LoadsVariation> loadsVariations = loadsVariationInfosList.stream().map(loadsVariationInfos -> {
             // build as a unique IS_PART_OF expert-filter then evaluate
             ExpertFilter filter = ExpertFilter.builder()
-                    .equipmentType(EquipmentType.LOAD)
-                    .rules(FilterUuidExpertRule.builder()
-                            .field(FieldType.ID)
-                            .operator(OperatorType.IS_PART_OF)
-                            .values(loadsVariationInfos.getLoadFilterUuids().stream().map(UUID::toString).collect(Collectors.toSet()))
-                            .build())
-                    .build();
+                .equipmentType(EquipmentType.LOAD)
+                .rules(FilterUuidExpertRule.builder()
+                    .field(FieldType.ID)
+                    .operator(OperatorType.IS_PART_OF)
+                    .values(loadsVariationInfos.getLoadFilters().stream()
+                        .map(IdNameInfos::getId)
+                        .map(UUID::toString).collect(Collectors.toSet()))
+                    .build())
+                .build();
 
             List<Load> loads = FiltersUtils.getIdentifiables(filter, network, filterClient::getFilters).stream()
                     .map(Load.class::cast).toList();
