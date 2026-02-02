@@ -33,7 +33,6 @@ import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMargi
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSecurityAnalysisParametersValues;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSimulationParametersValues;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.LoadsVariationInfos;
-import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DynamicSecurityAnalysisClient;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DynamicSimulationClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationResultContext;
@@ -53,7 +52,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationBusinessErrorCode.CONTINGENCIES_NOT_FOUND;
 import static org.gridsuite.dynamicmargincalculation.server.service.DynamicMarginCalculationService.COMPUTATION_TYPE;
 
 /**
@@ -131,9 +129,6 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
                 dynamicSecurityAnalysisClient.getParametersValues(runContext.getDynamicSecurityAnalysisParametersUuid(),
                 runContext.getNetworkUuid(), runContext.getVariantId());
         List<Contingency> contingencies = dynamicSecurityAnalysisParametersValues.getContingencies();
-        if (CollectionUtils.isEmpty(contingencies)) {
-            throw new DynamicMarginCalculationException(CONTINGENCIES_NOT_FOUND, "No contingencies");
-        }
 
         // get evaluated parameters values from the dynamic simulation server
         DynamicSimulationParametersValues dynamicSimulationParametersValues =

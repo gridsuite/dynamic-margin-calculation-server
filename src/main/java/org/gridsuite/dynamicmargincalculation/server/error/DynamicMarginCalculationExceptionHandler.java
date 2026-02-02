@@ -34,8 +34,7 @@ public class DynamicMarginCalculationExceptionHandler extends AbstractBusinessEx
     protected HttpStatus mapStatus(DynamicMarginCalculationBusinessErrorCode businessErrorCode) {
         return switch (businessErrorCode) {
             case PROVIDER_NOT_FOUND,
-                 CONTINGENCIES_NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case CONTINGENCY_LIST_EMPTY -> HttpStatus.INTERNAL_SERVER_ERROR;
+                 LOAD_FILTERS_NOT_FOUND -> HttpStatus.NOT_FOUND;
         };
     }
 

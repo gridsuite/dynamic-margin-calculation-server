@@ -13,8 +13,7 @@ import com.powsybl.ws.commons.error.BusinessErrorCode;
  */
 public enum DynamicMarginCalculationBusinessErrorCode implements BusinessErrorCode {
     PROVIDER_NOT_FOUND("dynamicMarginCalculation.providerNotFound"),
-    CONTINGENCIES_NOT_FOUND("dynamicMarginCalculation.contingenciesNotFound"),
-    CONTINGENCY_LIST_EMPTY("dynamicMarginCalculation.contingencyListEmpty");
+    LOAD_FILTERS_NOT_FOUND("dynamicMarginCalculation.loadFilterNotFound");
 
     private final String code;
 

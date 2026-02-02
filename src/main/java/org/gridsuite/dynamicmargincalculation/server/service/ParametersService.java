@@ -23,8 +23,8 @@ import org.gridsuite.dynamicmargincalculation.server.entities.parameters.Dynamic
 import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationException;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationParametersRepository;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DirectoryClient;
-import org.gridsuite.dynamicmargincalculation.server.service.client.FilterClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationRunContext;
+import org.gridsuite.filter.AbstractFilter;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.filter.expertfilter.expertrule.FilterUuidExpertRule;
 import org.gridsuite.filter.utils.EquipmentType;
@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.computation.error.ComputationBusinessErrorCode.PARAMETERS_NOT_FOUND;
+import static org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationBusinessErrorCode.LOAD_FILTERS_NOT_FOUND;
 import static org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculationBusinessErrorCode.PROVIDER_NOT_FOUND;
 
 /**
@@ -55,17 +56,17 @@ public class ParametersService {
 
     private final DirectoryClient directoryClient;
 
-    private final FilterClient filterClient;
+    private final FilterService filterService;
 
     @Autowired
     public ParametersService(@Value("${dynamic-margin-calculation.default-provider}") String defaultProvider,
                              DynamicMarginCalculationParametersRepository dynamicMarginCalculationParametersRepository,
                              DirectoryClient directoryClient,
-                             FilterClient filterClient) {
+                             FilterService filterService) {
         this.defaultProvider = defaultProvider;
         this.dynamicMarginCalculationParametersRepository = dynamicMarginCalculationParametersRepository;
         this.directoryClient = directoryClient;
-        this.filterClient = filterClient;
+        this.filterService = filterService;
     }
 
     public DynamicMarginCalculationRunContext createRunContext(UUID networkUuid, String variantId, String receiver,
@@ -211,6 +212,18 @@ public class ParametersService {
             return Collections.emptyList();
         }
 
+        // check none-existing load filters
+        List<UUID> loadFilerUuids = loadsVariationInfosList.stream().flatMap(loadsVariationInfos -> loadsVariationInfos.getLoadFilters().stream())
+                .distinct()
+                .map(IdNameInfos::getId)
+                .toList();
+        List<AbstractFilter> loadFilters = filterService.getFilters(loadFilerUuids);
+        Map<UUID, AbstractFilter> filterByUuidMap = loadFilters.stream().collect(Collectors.toMap(AbstractFilter::getId, filter -> filter));
+        List<String> missingFilterUuids = loadFilerUuids.stream().filter(uuid -> filterByUuidMap.get(uuid) == null).map(Objects::toString).toList();
+        if (CollectionUtils.isNotEmpty(missingFilterUuids)) {
+            throw new DynamicMarginCalculationException(LOAD_FILTERS_NOT_FOUND, "Some load filters do not exist", Map.of("filterUuids", " [" + String.join(", ", missingFilterUuids) + "]"));
+        }
+
         List<LoadsVariation> loadsVariations = loadsVariationInfosList.stream().map(loadsVariationInfos -> {
             // build as a unique IS_PART_OF expert-filter then evaluate
             ExpertFilter filter = ExpertFilter.builder()
@@ -224,7 +237,7 @@ public class ParametersService {
                     .build())
                 .build();
 
-            List<Load> loads = FiltersUtils.getIdentifiables(filter, network, filterClient::getFilters).stream()
+            List<Load> loads = FiltersUtils.getIdentifiables(filter, network, filterService::getFilters).stream()
                     .map(Load.class::cast).toList();
             return new LoadsVariation(loads, loadsVariationInfos.getVariation());
         }).toList();
