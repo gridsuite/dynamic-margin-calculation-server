@@ -96,6 +96,7 @@ public class DynamicMarginCalculationParametersEntity {
 
     private void assignLoadsVariations(List<LoadsVariationInfos> loadsVariationInfosList) {
         if (CollectionUtils.isEmpty(loadsVariationInfosList)) {
+            loadsVariations.clear();
             return;
         }
         // build existing loads variation Map
