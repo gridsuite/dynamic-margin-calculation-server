@@ -11,7 +11,6 @@ import com.powsybl.dynawo.margincalculation.MarginCalculationParameters;
 import com.powsybl.dynawo.margincalculation.loadsvariation.LoadsVariation;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
-import jakarta.transaction.Transactional;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.computation.dto.ReportInfos;
@@ -34,6 +33,7 @@ import org.gridsuite.filter.utils.expertfilter.OperatorType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,6 +69,7 @@ public class ParametersService {
         this.filterService = filterService;
     }
 
+    @Transactional(readOnly = true)
     public DynamicMarginCalculationRunContext createRunContext(UUID networkUuid, String variantId, String receiver,
            String provider, ReportInfos reportInfos, String userId,
            // should be UUID dynamicSimulationParametersUuid after moving dynamic simulation parameters to its server,
@@ -78,7 +79,7 @@ public class ParametersService {
            boolean debug) {
 
         // get parameters from the local database
-        DynamicMarginCalculationParametersInfos dynamicMarginCalculationParametersInfos = getParameters(dynamicMarginCalculationParametersUuid, null);
+        DynamicMarginCalculationParametersInfos dynamicMarginCalculationParametersInfos = doGetParameters(dynamicMarginCalculationParametersUuid, null);
         // take only active load variations
         dynamicMarginCalculationParametersInfos.setLoadsVariations(dynamicMarginCalculationParametersInfos.getLoadsVariations()
             .stream()
@@ -115,7 +116,12 @@ public class ParametersService {
 
     // --- Dynamic security analysis parameters related methods --- //
 
+    @Transactional(readOnly = true)
     public DynamicMarginCalculationParametersInfos getParameters(UUID parametersUuid, String userId) {
+        return doGetParameters(parametersUuid, userId);
+    }
+
+    private DynamicMarginCalculationParametersInfos doGetParameters(UUID parametersUuid, String userId) {
         DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
 
@@ -133,25 +139,30 @@ public class ParametersService {
                 loadsVariation.getLoadFilters().forEach(loadFilter ->
                     loadFilter.setName(elementsUuidToName.get(loadFilter.getId())))
             );
-            parameters.setElementsUuidToName(elementsUuidToName);
         }
 
         return parameters;
     }
 
+    @Transactional(readOnly = true)
     public String getProvider(UUID parametersUuid) {
         return dynamicMarginCalculationParametersRepository.findProviderById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
     }
 
+    @Transactional
     public UUID createParameters(DynamicMarginCalculationParametersInfos parametersInfos) {
+        return doCreateParameters(parametersInfos);
+    }
+
+    private UUID doCreateParameters(DynamicMarginCalculationParametersInfos parametersInfos) {
         return dynamicMarginCalculationParametersRepository.save(new DynamicMarginCalculationParametersEntity(parametersInfos)).getId();
     }
 
     @Transactional
     public UUID createDefaultParameters() {
         DynamicMarginCalculationParametersInfos defaultParametersInfos = getDefaultParametersValues(defaultProvider);
-        return createParameters(defaultParametersInfos);
+        return doCreateParameters(defaultParametersInfos);
     }
 
     public DynamicMarginCalculationParametersInfos getDefaultParametersValues(String provider) {
@@ -175,7 +186,7 @@ public class ParametersService {
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + sourceParametersUuid));
         DynamicMarginCalculationParametersInfos duplicatedParametersInfos = entity.toDto(true);
         duplicatedParametersInfos.setId(null);
-        return createParameters(duplicatedParametersInfos);
+        return doCreateParameters(duplicatedParametersInfos);
     }
 
     public List<DynamicMarginCalculationParametersInfos> getAllParameters() {
@@ -196,6 +207,7 @@ public class ParametersService {
         }
     }
 
+    @Transactional
     public void deleteParameters(UUID parametersUuid) {
         dynamicMarginCalculationParametersRepository.deleteById(parametersUuid);
     }

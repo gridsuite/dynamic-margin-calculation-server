@@ -7,10 +7,7 @@
 
 package org.gridsuite.dynamicmargincalculation.server.dto.parameters;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -19,6 +16,7 @@ import java.util.UUID;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class IdNameInfos {
     @Getter
     private UUID id;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025, RTE (http://www.rte-france.com)
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -52,7 +52,7 @@ public class DynamicMarginCalculationController {
         this.parametersService = parametersService;
     }
 
-    @PostMapping(value = "/networks/{networkUuid}/run", produces = "application/json")
+    @PostMapping(value = "/networks/{networkUuid}/run", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "run the dynamic margin calculation")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Run dynamic margin calculation")})
     public ResponseEntity<UUID> run(@PathVariable("networkUuid") UUID networkUuid,
@@ -84,7 +84,7 @@ public class DynamicMarginCalculationController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(resultUuid);
     }
 
-    @GetMapping(value = "/results/{resultUuid}/status", produces = "application/json")
+    @GetMapping(value = "/results/{resultUuid}/status", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get the dynamic margin calculation status from the database")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The dynamic margin calculation status"),
         @ApiResponse(responseCode = "204", description = "Dynamic margin calculation status is empty"),
@@ -94,7 +94,7 @@ public class DynamicMarginCalculationController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PutMapping(value = "/results/invalidate-status", produces = "application/json")
+    @PutMapping(value = "/results/invalidate-status", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Invalidate the dynamic margin calculation status from the database")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The dynamic margin calculation result uuids have been invalidated"),
         @ApiResponse(responseCode = "404", description = "Dynamic margin calculation result has not been found")})
@@ -144,7 +144,7 @@ public class DynamicMarginCalculationController {
         return ResponseEntity.ok().body(dynamicMarginCalculationService.getDefaultProvider());
     }
 
-    @GetMapping(value = "/results/{resultUuid}/download-debug-file", produces = "application/json")
+    @GetMapping(value = "/results/{resultUuid}/download-debug-file", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Download a dynamic margin calculation debug file")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Dynamic margin calculation debug file"),
         @ApiResponse(responseCode = "404", description = "Dynamic margin calculation debug file has not been found")})

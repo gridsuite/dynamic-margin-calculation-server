@@ -79,7 +79,6 @@ public class DynamicMarginCalculationParametersEntity {
     private void assignAttributes(DynamicMarginCalculationParametersInfos parametersInfos) {
         if (id == null) {
             id = UUID.randomUUID();
-            parametersInfos.setId(id);
         }
         provider = parametersInfos.getProvider();
         startTime = parametersInfos.getStartTime();

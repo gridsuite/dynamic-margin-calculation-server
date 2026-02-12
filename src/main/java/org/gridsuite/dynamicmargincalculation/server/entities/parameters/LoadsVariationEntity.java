@@ -51,7 +51,6 @@ public class LoadsVariationEntity {
     public void assignAttributes(LoadsVariationInfos loadsVariationInfos) {
         if (id == null) {
             id = UUID.randomUUID();
-            loadsVariationInfos.setId(id);
         }
         variation = loadsVariationInfos.getVariation();
         active = loadsVariationInfos.getActive();

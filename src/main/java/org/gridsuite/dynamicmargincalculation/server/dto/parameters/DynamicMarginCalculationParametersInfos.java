@@ -14,7 +14,6 @@ import com.powsybl.dynawo.margincalculation.MarginCalculationParameters.LoadMode
 import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -57,8 +56,5 @@ public class DynamicMarginCalculationParametersInfos {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<LoadsVariationInfos> loadsVariations;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Map<UUID, String> elementsUuidToName;
 
 }
