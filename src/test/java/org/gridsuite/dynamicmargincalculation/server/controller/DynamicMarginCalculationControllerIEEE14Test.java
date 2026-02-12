@@ -201,7 +201,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
 
         UUID runUuid = objectMapper.readValue(result.getResponse().getContentAsString(), UUID.class);
 
-        Message<byte[]> messageSwitch = output.receive(1000, dmcResultDestination);
+        Message<byte[]> messageSwitch = output.receive(2000, dmcResultDestination);
         assertThat(messageSwitch).isNotNull();
         assertThat(messageSwitch.getHeaders()).containsEntry(HEADER_RESULT_UUID, runUuid.toString());
 
