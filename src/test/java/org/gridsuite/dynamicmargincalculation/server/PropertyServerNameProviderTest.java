@@ -6,7 +6,6 @@
  */
 package org.gridsuite.dynamicmargincalculation.server;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Mohamed Ben-rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
  */
-@Disabled
 class PropertyServerNameProviderTest {
 
     @Test

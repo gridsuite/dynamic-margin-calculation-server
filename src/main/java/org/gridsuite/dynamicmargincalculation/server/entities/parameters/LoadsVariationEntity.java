@@ -31,6 +31,7 @@ public class LoadsVariationEntity {
     @Column(name = "id")
     private UUID id;
 
+    @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "loads_variation_load_filter",

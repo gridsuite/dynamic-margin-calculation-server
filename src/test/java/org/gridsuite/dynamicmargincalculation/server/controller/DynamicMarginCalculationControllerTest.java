@@ -26,7 +26,6 @@ import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMargi
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSecurityAnalysisParametersValues;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSimulationParametersValues;
 import org.gridsuite.dynamicmargincalculation.server.entities.parameters.DynamicMarginCalculationParametersEntity;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@Disabled
 public class DynamicMarginCalculationControllerTest extends AbstractDynamicMarginCalculationControllerTest {
 
     // directories
