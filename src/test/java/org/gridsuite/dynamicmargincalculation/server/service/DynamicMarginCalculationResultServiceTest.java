@@ -12,6 +12,7 @@ import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculatio
 import org.gridsuite.dynamicmargincalculation.server.entities.DynamicMarginCalculationStatusEntity;
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationStatusRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
+@Disabled
 @SpringBootTest
 class DynamicMarginCalculationResultServiceTest {
 

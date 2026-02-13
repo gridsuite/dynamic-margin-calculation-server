@@ -30,7 +30,6 @@ import org.gridsuite.filter.utils.EquipmentType;
 import org.gridsuite.filter.utils.expertfilter.CombinatorType;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
@@ -182,7 +181,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
                         .build());
     }
 
-    @Disabled("To ignore test with container")
+    // @Disabled("To ignore test with container")
     @Test
     void test01IEEE14() throws Exception {
         // The controller requires a request body string: dynamicSimulationParametersJson.
