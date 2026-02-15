@@ -27,7 +27,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "load_increase_result", indexes = {@Index(name = "load_increase_result_idx", columnList = "dynamic_margin_calculation_result_uuid")})
+@Table(name = "load_increase_result", indexes = {@Index(name = "idx_load_increase_result_dynamic_margin_calculation_result_uuid",
+        columnList = "dynamic_margin_calculation_result_uuid")})
 public class LoadIncreaseResultEntity {
     @Id
     @Column(name = "id")
@@ -58,7 +59,7 @@ public class LoadIncreaseResultEntity {
                 foreignKey = @ForeignKey(name = "load_increase_result_failed_criteria_load_increase_result_id_fk")
             ),
             indexes = {
-                @Index(name = "load_increase_result_failed_criteria_idx", columnList = "load_increase_result_id")
+                @Index(name = "idx_load_increase_result_failed_criteria_load_increase_result_id", columnList = "load_increase_result_id")
             }
     )
     @OrderColumn(name = "pos")

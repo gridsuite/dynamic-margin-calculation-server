@@ -25,7 +25,8 @@ import java.util.UUID;
 @Setter
 @Builder
 @Entity
-@Table(name = "loads_variation")
+@Table(name = "loads_variation", indexes = @Index(name = "idx_loads_variation_dynamic_margin_calculation_parameters_id",
+        columnList = "dynamic_margin_calculation_parameters_id"))
 public class LoadsVariationEntity {
     @Id
     @Column(name = "id")
@@ -36,7 +37,8 @@ public class LoadsVariationEntity {
     @CollectionTable(
             name = "loads_variation_load_filter",
             joinColumns = @JoinColumn(name = "loads_variation_id"),
-            foreignKey = @ForeignKey(name = "loads_variation_id_fk")
+            foreignKey = @ForeignKey(name = "loads_variation_id_fk"),
+            indexes = { @Index(name = "idx_loads_variation_load_filter_loads_variation_id", columnList = "loads_variation_id") }
     )
     @Column(name = "load_filter_id", nullable = false)
     private List<UUID> loadFilterIds = new ArrayList<>();

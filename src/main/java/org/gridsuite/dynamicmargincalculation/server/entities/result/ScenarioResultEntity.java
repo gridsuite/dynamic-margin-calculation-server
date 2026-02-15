@@ -26,7 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "scenario_result", indexes = @Index(name = "scenario_result_idx", columnList = "load_increase_result_id")
+@Table(name = "scenario_result", indexes = @Index(name = "idx_scenario_result_load_increase_result_id", columnList = "load_increase_result_id")
 )
 public class ScenarioResultEntity {
 
@@ -50,7 +50,7 @@ public class ScenarioResultEntity {
                 foreignKey = @ForeignKey(name = "scenario_result_failed_criteria_scenario_result_id_fk")
             ),
             indexes = {
-                @Index(name = "scenario_result_failed_criteria_idx", columnList = "scenario_result_id")
+                @Index(name = "idx_scenario_result_failed_criteria_scenario_result_id", columnList = "scenario_result_id")
             }
     )
     @OrderColumn(name = "pos")
