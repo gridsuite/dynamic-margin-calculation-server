@@ -9,9 +9,11 @@ package org.gridsuite.dynamicmargincalculation.server.dto.parameters;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.powsybl.dynawo.DynawoSimulationParameters;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigsJsonDeserializer;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigsJsonSerializer;
 import lombok.*;
 
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DynamicSimulationParametersValues {
+    @JsonSerialize(using = DynamicModelConfigsJsonSerializer.class)
     @JsonDeserialize(using = DynamicModelConfigsJsonDeserializer.class)
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     List<DynamicModelConfig> dynamicModel;

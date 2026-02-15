@@ -76,12 +76,12 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
     // directories
     public static final String DATA_IEEE14_BASE_DIR = RESOURCE_PATH_DELIMITER + "data" + RESOURCE_PATH_DELIMITER + "ieee14";
 
-    private static final UUID NETWORK_UUID = UUID.randomUUID();
+    private static final UUID NETWORK_UUID = UUID.fromString("508a9a3a-cc8d-4bb2-97fa-1d38a5dd4ac1");
     private static final String VARIANT_1_ID = "variant_1";
     private static final String NETWORK_FILE = "IEEE14.iidm";
 
-    private static final UUID PARAMETERS_UUID = UUID.randomUUID();
-    private static final UUID DSA_PARAMETERS_UUID = UUID.randomUUID();
+    private static final UUID PARAMETERS_UUID = UUID.fromString("34f54d14-92ab-4616-a705-e9711275fc3b");
+    private static final UUID DSA_PARAMETERS_UUID = UUID.fromString("bb9f39cf-7146-4892-8005-cd7c3fa48333");
 
     private static final String LINE_ID = "_BUS____1-BUS____5-1_AC";
     private static final String GEN_ID = "_GEN____2_SM";

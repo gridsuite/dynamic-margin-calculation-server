@@ -75,12 +75,12 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
     public static final String DYNAMIC_SIMULATION_PARAMETERS_DUMP_FILE = "dynamicSimulationParameters.dmp";
 
     public static final String NETWORK_FILE = "IEEE14.iidm";
-    private static final UUID NETWORK_UUID = UUID.randomUUID();
+    private static final UUID NETWORK_UUID = UUID.fromString("43b0f54e-e8fc-4607-8f53-e1cab1075ab5");
     private static final String VARIANT_1_ID = "variant_1";
 
-    private static final UUID DSA_PARAMETERS_UUID = UUID.randomUUID();
-    private static final UUID PARAMETERS_UUID = UUID.randomUUID();
-    private static final UUID FILTER_UUID = UUID.randomUUID();
+    private static final UUID DSA_PARAMETERS_UUID = UUID.fromString("2745666a-0abe-4c3a-8b91-a719c1d1f753");
+    private static final UUID PARAMETERS_UUID = UUID.fromString("e786c4ca-64e7-4f44-b6a2-8f23b8b4334a");
+    private static final UUID FILTER_UUID = UUID.fromString("b234ce92-23f2-422c-b239-ec69abc399bd");
 
     @Autowired
     private OutputDestination output;
@@ -122,7 +122,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
         initDynamicSecurityAnalysisClientMock();
 
         // Mock for the filer client
-        when(filterClient.getFilters(eq(List.of(FILTER_UUID))))
+        when(filterClient.getFilters(List.of(FILTER_UUID)))
             .thenReturn(
                 List.of(
                     ExpertFilter.builder()
@@ -181,7 +181,6 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
                         .build());
     }
 
-    // @Disabled("To ignore test with container")
     @Test
     void test01IEEE14() throws Exception {
         // The controller requires a request body string: dynamicSimulationParametersJson.

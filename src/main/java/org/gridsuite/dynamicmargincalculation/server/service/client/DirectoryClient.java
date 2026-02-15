@@ -30,7 +30,6 @@ import static org.gridsuite.computation.service.NotificationService.HEADER_USER_
 import static org.gridsuite.dynamicmargincalculation.server.service.client.utils.UrlUtils.buildEndPointUrl;
 
 /**
- *
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @Service
