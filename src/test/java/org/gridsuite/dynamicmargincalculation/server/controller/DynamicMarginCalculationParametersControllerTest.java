@@ -34,7 +34,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.gridsuite.computation.service.NotificationService.HEADER_USER_ID;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
@@ -164,7 +163,7 @@ class DynamicMarginCalculationParametersControllerTest {
         UUID parametersUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(infos)).getId();
 
         // service enrichment uses DirectoryClient only when userId is provided
-        when(directoryClient.getElementNames(eq(List.of(LOAD_FILTER_UUID_1, LOAD_FILTER_UUID_2)), eq(USER_ID)))
+        when(directoryClient.getElementNames(List.of(LOAD_FILTER_UUID_1, LOAD_FILTER_UUID_2), USER_ID))
                 .thenReturn(Map.of(
                         LOAD_FILTER_UUID_1, "Filter 1",
                         LOAD_FILTER_UUID_2, "Filter 2"
@@ -187,7 +186,7 @@ class DynamicMarginCalculationParametersControllerTest {
         assertThat(returned.getLoadsVariations().getFirst().getLoadFilters().getFirst().getName()).isEqualTo("Filter 1");
         assertThat(returned.getLoadsVariations().getFirst().getLoadFilters().get(1).getName()).isEqualTo("Filter 2");
 
-        verify(directoryClient, times(1)).getElementNames(eq(List.of(LOAD_FILTER_UUID_1, LOAD_FILTER_UUID_2)), eq(USER_ID));
+        verify(directoryClient, times(1)).getElementNames(List.of(LOAD_FILTER_UUID_1, LOAD_FILTER_UUID_2), USER_ID);
     }
 
     @Test
@@ -218,7 +217,7 @@ class DynamicMarginCalculationParametersControllerTest {
         UUID parametersUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(infos)).getId();
 
         DynamicMarginCalculationParametersInfos updatedInfos = newParametersInfos();
-        updatedInfos.setAccuracy(1); // change a field to ensure update persists
+        updatedInfos.setAccuracy(2); // change a field to ensure update persists
 
         mockMvc.perform(put("/v1/parameters/{uuid}", parametersUuid)
                         .contentType(APPLICATION_JSON)
@@ -229,7 +228,7 @@ class DynamicMarginCalculationParametersControllerTest {
         assertThat(entityOpt).isPresent();
 
         DynamicMarginCalculationParametersInfos persisted = entityOpt.get().toDto(false);
-        assertThat(persisted.getAccuracy()).isEqualTo(1);
+        assertThat(persisted.getAccuracy()).isEqualTo(2);
     }
 
     @Test
