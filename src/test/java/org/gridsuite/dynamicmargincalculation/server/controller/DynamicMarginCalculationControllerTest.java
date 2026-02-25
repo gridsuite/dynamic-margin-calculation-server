@@ -105,7 +105,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
 
     @Override
     protected void initParametersRepositoryMock() {
-        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues("Dynawo");
+        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues();
         params.setLoadsVariations(List.of()); // keep test independent from directory/filter enrichment
 
         DynamicMarginCalculationParametersEntity entity = new DynamicMarginCalculationParametersEntity(params);

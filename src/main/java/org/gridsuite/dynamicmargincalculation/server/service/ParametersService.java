@@ -161,14 +161,14 @@ public class ParametersService {
 
     @Transactional
     public UUID createDefaultParameters() {
-        DynamicMarginCalculationParametersInfos defaultParametersInfos = getDefaultParametersValues(defaultProvider);
+        DynamicMarginCalculationParametersInfos defaultParametersInfos = getDefaultParametersValues();
         return doCreateParameters(defaultParametersInfos);
     }
 
-    public DynamicMarginCalculationParametersInfos getDefaultParametersValues(String provider) {
+    public DynamicMarginCalculationParametersInfos getDefaultParametersValues() {
         MarginCalculationParameters defaultConfigParameters = MarginCalculationParameters.load();
         return DynamicMarginCalculationParametersInfos.builder()
-                .provider(provider)
+                .provider(defaultProvider)
                 .startTime(defaultConfigParameters.getStartTime())
                 .stopTime(defaultConfigParameters.getStopTime())
                 .marginCalculationStartTime(defaultConfigParameters.getMarginCalculationStartTime())
@@ -200,8 +200,8 @@ public class ParametersService {
         DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
         if (parametersInfos == null) {
-            // if the parameter is null, it means it's a reset to defaultValues, but we need to keep the provider because it's updated separately
-            entity.update(getDefaultParametersValues(Optional.ofNullable(entity.getProvider()).orElse(defaultProvider)));
+            // if the parameter is null, it means it's a reset to defaultValues
+            entity.update(getDefaultParametersValues());
         } else {
             entity.update(parametersInfos);
         }
@@ -210,13 +210,6 @@ public class ParametersService {
     @Transactional
     public void deleteParameters(UUID parametersUuid) {
         dynamicMarginCalculationParametersRepository.deleteById(parametersUuid);
-    }
-
-    @Transactional
-    public void updateProvider(UUID parametersUuid, String provider) {
-        DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
-                .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
-        entity.setProvider(provider != null ? provider : defaultProvider);
     }
 
     public List<LoadsVariation> getLoadsVariations(List<LoadsVariationInfos> loadsVariationInfosList, Network network) {
@@ -236,7 +229,7 @@ public class ParametersService {
             throw new DynamicMarginCalculationException(LOAD_FILTERS_NOT_FOUND, "Some load filters do not exist", Map.of("filterUuids", " [" + String.join(", ", missingFilterUuids) + "]"));
         }
 
-        List<LoadsVariation> loadsVariations = loadsVariationInfosList.stream().map(loadsVariationInfos -> {
+        return loadsVariationInfosList.stream().map(loadsVariationInfos -> {
             // build as a unique IS_PART_OF expert-filter then evaluate
             ExpertFilter filter = ExpertFilter.builder()
                 .equipmentType(EquipmentType.LOAD)
@@ -253,8 +246,6 @@ public class ParametersService {
                     .map(Load.class::cast).toList();
             return new LoadsVariation(loads, loadsVariationInfos.getVariation());
         }).toList();
-
-        return loadsVariations;
     }
 
 }
