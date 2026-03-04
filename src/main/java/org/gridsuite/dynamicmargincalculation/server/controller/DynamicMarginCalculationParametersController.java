@@ -103,15 +103,4 @@ public class DynamicMarginCalculationParametersController {
             @Parameter(description = "parameters UUID") @PathVariable("uuid") UUID parametersUuid) {
         return ResponseEntity.ok(parametersService.getProvider(parametersUuid));
     }
-
-    @PutMapping(value = "/{uuid}/provider")
-    @Operation(summary = "Update provider")
-    @ApiResponse(responseCode = "200", description = "provider was updated")
-    public ResponseEntity<Void> updateProvider(
-            @Parameter(description = "parameters UUID") @PathVariable("uuid") UUID parametersUuid,
-            @RequestBody(required = false) String provider) {
-        parametersService.updateProvider(parametersUuid, provider);
-        return ResponseEntity.ok().build();
-    }
-
 }

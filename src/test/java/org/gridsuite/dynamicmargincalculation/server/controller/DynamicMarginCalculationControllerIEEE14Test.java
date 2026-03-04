@@ -93,7 +93,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
     @Override
     protected void initParametersRepositoryMock() {
         // Use defaults from service to keep test stable across parameter schema changes
-        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues("Dynawo");
+        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues();
         params.setLoadsVariations(List.of(
                 LoadsVariationInfos.builder()
                         .loadFilters(List.of(IdNameInfos.builder().id(FILTER_UUID).build()))

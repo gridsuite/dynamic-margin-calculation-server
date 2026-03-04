@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.gridsuite.computation.service.NotificationService.HEADER_USER_ID;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -78,13 +77,13 @@ class DynamicMarginCalculationParametersControllerTest {
 
     private DynamicMarginCalculationParametersInfos newParametersInfos() {
         // Keep the DTO minimal and stable for CRUD tests (no need to involve filter evaluation).
-        DynamicMarginCalculationParametersInfos infos = parametersService.getDefaultParametersValues("Dynawo");
+        DynamicMarginCalculationParametersInfos infos = parametersService.getDefaultParametersValues();
         infos.setLoadsVariations(List.of()); // make explicit to avoid null handling differences
         return infos;
     }
 
     private DynamicMarginCalculationParametersInfos newParametersInfosWithLoadFilters() {
-        DynamicMarginCalculationParametersInfos infos = parametersService.getDefaultParametersValues("Dynawo");
+        DynamicMarginCalculationParametersInfos infos = parametersService.getDefaultParametersValues();
 
         LoadsVariationInfos loadsVariationInfos = LoadsVariationInfos.builder()
                 .active(true)
@@ -253,22 +252,5 @@ class DynamicMarginCalculationParametersControllerTest {
                 .andReturn();
         String provider = result.getResponse().getContentAsString();
         assertThat(provider).isEqualTo("Dynawo");
-    }
-
-    @Test
-    void testUpdateProvider() throws Exception {
-        DynamicMarginCalculationParametersInfos infos = newParametersInfos();
-        UUID parametersUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(infos)).getId();
-
-        String newProvider = "Dynawo";
-
-        mockMvc.perform(put("/v1/parameters/{uuid}/provider", parametersUuid)
-                        .contentType(TEXT_PLAIN_VALUE)
-                        .content(newProvider))
-                .andExpect(status().isOk());
-
-        Optional<DynamicMarginCalculationParametersEntity> entityOpt = parametersRepository.findById(parametersUuid);
-        assertThat(entityOpt).isPresent();
-        assertThat(entityOpt.get().getProvider()).isEqualTo(newProvider);
     }
 }
