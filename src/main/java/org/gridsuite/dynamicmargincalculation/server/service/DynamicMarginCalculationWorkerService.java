@@ -221,8 +221,12 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
     }
 
     @Bean
-    @Override
-    public Consumer<Message<String>> consumeRun() {
+    public Consumer<Message<String>> consumeRun1() {
+        return super.consumeRun();
+    }
+
+    @Bean
+    public Consumer<Message<String>> consumeRun2() {
         return super.consumeRun();
     }
 
