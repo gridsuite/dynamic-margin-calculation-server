@@ -62,9 +62,9 @@ public class DynamicMarginCalculationController {
                                           @RequestParam(name = REPORT_TYPE_HEADER, required = false, defaultValue = "DynamicMarginCalculation") String reportType,
                                           @RequestParam(name = HEADER_PROVIDER, required = false) String provider,
                                           @RequestParam(name = HEADER_DEBUG, required = false, defaultValue = "false") boolean debug,
+                                          @RequestParam(name = "dynamicSimulationParametersUuid") UUID dynamicSimulationParametersUuid,
                                           @RequestParam(name = "dynamicSecurityAnalysisParametersUuid") UUID dynamicSecurityAnalysisParametersUuid,
                                           @RequestParam(name = "parametersUuid") UUID parametersUuid,
-                                          @RequestBody String dynamicSimulationParametersJson,
                                           @RequestHeader(HEADER_USER_ID) String userId) {
 
         DynamicMarginCalculationRunContext dynamicMarginCalculationRunContext = parametersService.createRunContext(
@@ -74,7 +74,7 @@ public class DynamicMarginCalculationController {
             provider,
             ReportInfos.builder().reportUuid(reportId).reporterId(reportName).computationType(reportType).build(),
             userId,
-            dynamicSimulationParametersJson,
+            dynamicSimulationParametersUuid,
             dynamicSecurityAnalysisParametersUuid,
             parametersUuid,
             debug);

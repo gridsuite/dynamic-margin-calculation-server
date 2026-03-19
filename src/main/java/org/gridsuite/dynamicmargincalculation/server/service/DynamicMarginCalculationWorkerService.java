@@ -132,7 +132,7 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
 
         // get evaluated parameters values from the dynamic simulation server
         DynamicSimulationParametersValues dynamicSimulationParametersValues =
-                dynamicSimulationClient.getParametersValues(runContext.getDynamicSimulationParametersJson(),
+                dynamicSimulationClient.getParametersValues(runContext.getDynamicSimulationParametersUuid(),
                 runContext.getNetworkUuid(), runContext.getVariantId());
 
         // get dynamic model list from dynamic simulation server
