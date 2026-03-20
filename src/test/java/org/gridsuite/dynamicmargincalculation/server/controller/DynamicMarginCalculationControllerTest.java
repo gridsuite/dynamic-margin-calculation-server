@@ -253,14 +253,20 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
     @Test
     void testRunWithSynchronousExceptions() throws Exception {
 
+        // mock a fake provider in a parameter
+        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues();
+        params.setProvider("notFoundProvider");
+        DynamicMarginCalculationParametersEntity entity = new DynamicMarginCalculationParametersEntity(params);
+        UUID notFoundProviderParametersUuid = UUID.randomUUID();
+        given(dynamicMarginCalculationParametersRepository.findById(notFoundProviderParametersUuid)).willReturn(Optional.of(entity));
+
         // provider not found
         mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
-                                .param(HEADER_PROVIDER, "notFoundProvider")
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
                                 .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
-                                .param("parametersUuid", PARAMETERS_UUID.toString())
+                                .param("parametersUuid", notFoundProviderParametersUuid.toString())
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isNotFound());
