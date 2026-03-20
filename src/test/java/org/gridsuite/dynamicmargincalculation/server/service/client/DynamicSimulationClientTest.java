@@ -30,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,9 +66,9 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
     void testGetParametersValues() throws Exception {
 
         // --- Setup --- //
+        UUID dynamicSimulationParametersUuid = UUID.fromString("ee4496de-0a8a-4ced-8ab1-7fff57b0d717");
         UUID networkUuid = UUID.fromString("e6516424-21c3-4bff-953d-9d0efc20ea08");
         String variantId = "variant_1";
-        String dynamicSimulationParametersJson = "{}";
 
         // prepare dynamic model
         List<DynamicModelConfig> dynamicModel = List.of(new DynamicModelConfig("LoadAlphaBeta", "_DM", SetGroupType.SUFFIX, List.of(
@@ -108,13 +107,11 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
         String bodyJson = objectMapper.writeValueAsString(expected);
 
         String baseEndpoint = buildEndPointUrl("", API_VERSION, DYNAMIC_SIMULATION_END_POINT_PARAMETERS);
-        String urlPath = baseEndpoint + "/values";
+        String urlPath = baseEndpoint + "/" + dynamicSimulationParametersUuid + "/values";
 
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathEqualTo(urlPath))
+        wireMockServer.stubFor(WireMock.get(WireMock.urlPathEqualTo(urlPath))
                 .withQueryParam("networkUuid", equalTo(networkUuid.toString()))
                 .withQueryParam(VARIANT_ID_HEADER, equalTo(variantId))
-                .withHeader(HttpHeaders.CONTENT_TYPE, containing(MediaType.APPLICATION_JSON_VALUE))
-                .withRequestBody(WireMock.equalToJson(dynamicSimulationParametersJson))
                 .willReturn(WireMock.ok()
                         .withBody(bodyJson)
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -122,7 +119,7 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
 
         // --- Execute --- //
         DynamicSimulationParametersValues result =
-                dynamicSimulationClient.getParametersValues(dynamicSimulationParametersJson, networkUuid, variantId);
+                dynamicSimulationClient.getParametersValues(dynamicSimulationParametersUuid, networkUuid, variantId);
 
         // --- Verify --- //
         assertThat(result).usingRecursiveComparison().isEqualTo(expected);
@@ -132,14 +129,14 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
     void testGetParametersValuesGivenException() {
 
         // --- Setup --- //
+        UUID dynamicSimulationParametersUuid = UUID.fromString("ef8061f1-b16c-49be-96df-9674af01d795");
         UUID networkUuid = UUID.fromString("4b364ee1-2933-401a-ae3c-e79253b2de67");
         String variantId = "variant_1";
-        String dynamicSimulationParametersJson = "{}";
 
         String baseEndpoint = buildEndPointUrl("", API_VERSION, DYNAMIC_SIMULATION_END_POINT_PARAMETERS);
-        String urlPath = baseEndpoint + "/values";
+        String urlPath = baseEndpoint + "/" + dynamicSimulationParametersUuid + "/values";
 
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathEqualTo(urlPath))
+        wireMockServer.stubFor(WireMock.get(WireMock.urlPathEqualTo(urlPath))
                 .withQueryParam("networkUuid", equalTo(networkUuid.toString()))
                 .withQueryParam(VARIANT_ID_HEADER, equalTo(variantId))
                 .willReturn(WireMock.serverError()
@@ -148,7 +145,7 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
 
         // --- Execute --- //
         HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class,
-                () -> dynamicSimulationClient.getParametersValues(dynamicSimulationParametersJson, networkUuid, variantId));
+                () -> dynamicSimulationClient.getParametersValues(dynamicSimulationParametersUuid, networkUuid, variantId));
 
         // --- Verify --- //
         assertThat(exception.getMessage()).contains(ERROR_MESSAGE);
