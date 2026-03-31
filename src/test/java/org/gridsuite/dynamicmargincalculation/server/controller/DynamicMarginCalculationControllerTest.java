@@ -229,10 +229,10 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         );
         assertThat(statusAfterInvalidate).isSameAs(DynamicMarginCalculationStatus.NOT_DONE);
 
-        // invalidate status for unknown result => 404 (controller returns notFound when update list is empty)
+        // invalidate status for unknown result => 200 (same as delete)
         mockMvc.perform(put("/v1/results/invalidate-status")
                         .param("resultUuid", UUID.randomUUID().toString()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
 
         // delete one result
         mockMvc.perform(delete("/v1/results/{resultUuid}", runUuid))
