@@ -48,7 +48,8 @@ import static org.gridsuite.computation.service.AbstractResultContext.VARIANT_ID
 import static org.gridsuite.computation.service.NotificationService.HEADER_RESULT_UUID;
 import static org.gridsuite.computation.service.NotificationService.HEADER_USER_ID;
 import static org.gridsuite.dynamicmargincalculation.server.controller.utils.TestUtils.RESOURCE_PATH_DELIMITER;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -78,6 +79,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
     private static final UUID NETWORK_UUID = UUID.fromString("43b0f54e-e8fc-4607-8f53-e1cab1075ab5");
     private static final String VARIANT_1_ID = "variant_1";
 
+    private static final UUID DS_PARAMETERS_UUID = UUID.fromString("ca76b46c-b013-4453-b2a2-f64107dd023b");
     private static final UUID DSA_PARAMETERS_UUID = UUID.fromString("2745666a-0abe-4c3a-8b91-a719c1d1f753");
     private static final UUID PARAMETERS_UUID = UUID.fromString("e786c4ca-64e7-4f44-b6a2-8f23b8b4334a");
     private static final UUID FILTER_UUID = UUID.fromString("b234ce92-23f2-422c-b239-ec69abc399bd");
@@ -163,7 +165,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
             DynamicSimulationParameters dynamicSimulationParameters = objectMapper.readValue(dynamicSimulationParametersIS, DynamicSimulationParameters.class);
 
             // Mock for dynamic simulation server
-            when(dynamicSimulationClient.getParametersValues(anyString(), eq(NETWORK_UUID), any()))
+            when(dynamicSimulationClient.getParametersValues(eq(DS_PARAMETERS_UUID), eq(NETWORK_UUID), any()))
                     .thenReturn(DynamicSimulationParametersValues.builder()
                             .dynamicModel(dynamicModel)
                             .dynawoParameters(dynamicSimulationParameters.getExtension(DynawoSimulationParameters.class))
@@ -183,17 +185,15 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
 
     @Test
     void test01IEEE14() throws Exception {
-        // The controller requires a request body string: dynamicSimulationParametersJson.
-        String dynamicSimulationParametersJson = "{}";
 
         // run dynamic margin calculation on a specific variant
         MvcResult result = mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID.toString())
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", PARAMETERS_UUID.toString())
                                 .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isOk())

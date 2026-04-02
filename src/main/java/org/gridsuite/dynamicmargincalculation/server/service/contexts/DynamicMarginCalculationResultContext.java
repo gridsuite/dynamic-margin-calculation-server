@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.computation.dto.ReportInfos;
 import org.gridsuite.computation.service.AbstractResultContext;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicMarginCalculationParametersInfos;
-import org.gridsuite.dynamicmargincalculation.server.utils.GZipUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
@@ -29,7 +28,7 @@ import static org.gridsuite.computation.utils.MessageUtils.getNonNullHeader;
  */
 public class DynamicMarginCalculationResultContext extends AbstractResultContext<DynamicMarginCalculationRunContext> {
 
-    private static final String HEADER_DYNAMIC_SIMULATION_PARAMETERS_JSON_UUID = "dynamicSimulationParametersJson";
+    private static final String HEADER_DYNAMIC_SIMULATION_PARAMETERS_UUID = "dynamicSimulationParametersUuid";
     private static final String HEADER_DYNAMIC_SECURITY_ANALYSIS_PARAMETERS_UUID = "dynamicSecurityAnalysisParametersUuid";
 
     public DynamicMarginCalculationResultContext(UUID resultUuid, DynamicMarginCalculationRunContext runContext) {
@@ -74,18 +73,15 @@ public class DynamicMarginCalculationResultContext extends AbstractResultContext
         // specific headers
         UUID dynamicSecurityAnalysisParametersUuid = UUID.fromString(getNonNullHeader(headers, HEADER_DYNAMIC_SECURITY_ANALYSIS_PARAMETERS_UUID));
         runContext.setDynamicSecurityAnalysisParametersUuid(dynamicSecurityAnalysisParametersUuid);
-        // TODO : using directly uuid after moving dynamic simulation parameters to its server
-        String compressedJson = headers.get(HEADER_DYNAMIC_SIMULATION_PARAMETERS_JSON_UUID).toString();
-        runContext.setDynamicSimulationParametersJson(GZipUtils.decompress(compressedJson));
+        UUID dynamicSimulationParametersUuid = UUID.fromString(getNonNullHeader(headers, HEADER_DYNAMIC_SIMULATION_PARAMETERS_UUID));
+        runContext.setDynamicSimulationParametersUuid(dynamicSimulationParametersUuid);
 
         return new DynamicMarginCalculationResultContext(resultUuid, runContext);
     }
 
     @Override
     public Map<String, String> getSpecificMsgHeaders(ObjectMapper objectMapper) {
-        // TODO : using directly uuid after moving dynamic simulation parameters to its server
-        String compressedJson = GZipUtils.compress(getRunContext().getDynamicSimulationParametersJson());
         return Map.of(HEADER_DYNAMIC_SECURITY_ANALYSIS_PARAMETERS_UUID, getRunContext().getDynamicSecurityAnalysisParametersUuid().toString(),
-                HEADER_DYNAMIC_SIMULATION_PARAMETERS_JSON_UUID, compressedJson);
+                HEADER_DYNAMIC_SIMULATION_PARAMETERS_UUID, getRunContext().getDynamicSimulationParametersUuid().toString());
     }
 }

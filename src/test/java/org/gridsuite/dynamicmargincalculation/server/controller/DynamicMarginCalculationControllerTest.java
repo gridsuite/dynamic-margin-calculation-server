@@ -64,7 +64,6 @@ import static org.gridsuite.dynamicmargincalculation.server.controller.utils.Tes
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +80,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
     private static final String NETWORK_FILE = "IEEE14.iidm";
 
     private static final UUID PARAMETERS_UUID = UUID.fromString("34f54d14-92ab-4616-a705-e9711275fc3b");
+    private static final UUID DS_PARAMETERS_UUID = UUID.fromString("16920ed8-95dd-41ca-815c-2e20c5971754");
     private static final UUID DSA_PARAMETERS_UUID = UUID.fromString("bb9f39cf-7146-4892-8005-cd7c3fa48333");
 
     private static final String LINE_ID = "_BUS____1-BUS____5-1_AC";
@@ -129,7 +129,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                         .build());
 
         // Mock for dynamic simulation server
-        when(dynamicSimulationClient.getParametersValues(anyString(), eq(NETWORK_UUID), any()))
+        when(dynamicSimulationClient.getParametersValues(eq(DS_PARAMETERS_UUID), eq(NETWORK_UUID), any()))
                 .thenReturn(DynamicSimulationParametersValues.builder().build());
     }
 
@@ -151,16 +151,13 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                 AbortableInputStream.create(new ByteArrayInputStream("s3 debug file content".getBytes()))
         )).when(s3Client).getObject(any(GetObjectRequest.class));
 
-        // run with debug (body is the dynamicSimulationParametersJson string)
-        String dynamicSimulationParametersJson = "{}";
         MvcResult result = mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", PARAMETERS_UUID.toString())
                                 .param(HEADER_DEBUG, "true")
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isOk())
@@ -189,10 +186,9 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         // run on implicit default variant (variantId omitted)
         result = mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", PARAMETERS_UUID.toString())
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isOk())
@@ -233,10 +229,10 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         );
         assertThat(statusAfterInvalidate).isSameAs(DynamicMarginCalculationStatus.NOT_DONE);
 
-        // invalidate status for unknown result => 404 (controller returns notFound when update list is empty)
+        // invalidate status for unknown result => 200 (same as delete)
         mockMvc.perform(put("/v1/results/invalidate-status")
                         .param("resultUuid", UUID.randomUUID().toString()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
 
         // delete one result
         mockMvc.perform(delete("/v1/results/{resultUuid}", runUuid))
@@ -256,17 +252,21 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
 
     @Test
     void testRunWithSynchronousExceptions() throws Exception {
-        String dynamicSimulationParametersJson = "{}";
+
+        // mock a fake provider in a parameter
+        DynamicMarginCalculationParametersInfos params = parametersService.getDefaultParametersValues();
+        params.setProvider("notFoundProvider");
+        DynamicMarginCalculationParametersEntity entity = new DynamicMarginCalculationParametersEntity(params);
+        UUID notFoundProviderParametersUuid = UUID.randomUUID();
+        given(dynamicMarginCalculationParametersRepository.findById(notFoundProviderParametersUuid)).willReturn(Optional.of(entity));
 
         // provider not found
         mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
-                                .param(HEADER_PROVIDER, "notFoundProvider")
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
-                                .param("parametersUuid", PARAMETERS_UUID.toString())
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
+                                .param("parametersUuid", notFoundProviderParametersUuid.toString())
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isNotFound());
@@ -275,10 +275,9 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", UUID.randomUUID().toString())
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isNotFound());
@@ -297,17 +296,15 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                                         new ScenarioResult(GEN_ID, CONVERGENCE)))
                         ))))
                 .when(dynamicMarginCalculationWorkerService).getCompletableFuture(any(), any(), any());
-        String dynamicSimulationParametersJson = "{}";
 
         MvcResult result = mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", PARAMETERS_UUID.toString())
                                 .param("reportUuid", UUID.randomUUID().toString())
                                 .param(REPORTER_ID_HEADER, "dmc")
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId")
                 )
                 .andExpect(status().isOk())
@@ -349,16 +346,14 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
     }
 
     private UUID runAndCancel(CountDownLatch cancelLatch, int cancelDelayMs) throws Exception {
-        String dynamicSimulationParametersJson = "{}";
 
         // run the dynamic margin calculation
         MvcResult result = mockMvc.perform(
                         post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
                                 .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
                                 .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
                                 .param("parametersUuid", PARAMETERS_UUID.toString())
-                                .contentType(APPLICATION_JSON)
-                                .content(dynamicSimulationParametersJson)
                                 .header(HEADER_USER_ID, "testUserId"))
                 .andExpect(status().isOk())
                 .andReturn();
