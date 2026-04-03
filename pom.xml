@@ -47,6 +47,8 @@
         <liquibase-hibernate-package>org.gridsuite.dynamicmargincalculation.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
         <sonar.projectKey>org.gridsuite:dynamic-margin-calculation-server</sonar.projectKey>
+        <!-- FIXME: to be removed at next gridsuite-dependencies upgrade  -->
+        <gridsuite-computation.version>2.0.0</gridsuite-computation.version>
     </properties>
 
     <build>
@@ -154,7 +156,9 @@
         <dependency>
             <groupId>org.gridsuite</groupId>
             <artifactId>gridsuite-computation</artifactId>
-        </dependency>
+            <!-- FIXME: to be removed at next gridsuite-dependencies upgrade  -->
+            <version>${gridsuite-computation.version}</version>
+         </dependency>
         <dependency>
             <groupId>org.gridsuite</groupId>
             <artifactId>gridsuite-filter</artifactId>
