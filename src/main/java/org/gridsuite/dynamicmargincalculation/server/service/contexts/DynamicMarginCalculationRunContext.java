@@ -27,7 +27,7 @@ import java.util.UUID;
 @Setter
 public class DynamicMarginCalculationRunContext extends AbstractComputationRunContext<DynamicMarginCalculationParametersInfos> {
 
-    private String dynamicSimulationParametersJson;
+    private UUID dynamicSimulationParametersUuid;
     private UUID dynamicSecurityAnalysisParametersUuid;
 
     // --- Fields which are enriched in worker service --- //

@@ -132,7 +132,7 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
 
         // get evaluated parameters values from the dynamic simulation server
         DynamicSimulationParametersValues dynamicSimulationParametersValues =
-                dynamicSimulationClient.getParametersValues(runContext.getDynamicSimulationParametersJson(),
+                dynamicSimulationClient.getParametersValues(runContext.getDynamicSimulationParametersUuid(),
                 runContext.getNetworkUuid(), runContext.getVariantId());
 
         // get dynamic model list from dynamic simulation server
@@ -221,8 +221,12 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
     }
 
     @Bean
-    @Override
-    public Consumer<Message<String>> consumeRun() {
+    public Consumer<Message<String>> consumeRun1() {
+        return super.consumeRun();
+    }
+
+    @Bean
+    public Consumer<Message<String>> consumeRun2() {
         return super.consumeRun();
     }
 

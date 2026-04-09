@@ -71,9 +71,8 @@ public class ParametersService {
 
     @Transactional(readOnly = true)
     public DynamicMarginCalculationRunContext createRunContext(UUID networkUuid, String variantId, String receiver,
-           String provider, ReportInfos reportInfos, String userId,
-           // should be UUID dynamicSimulationParametersUuid after moving dynamic simulation parameters to its server,
-           String dynamicSimulationParametersJson,
+           ReportInfos reportInfos, String userId,
+           UUID dynamicSimulationParametersUuid,
            UUID dynamicSecurityAnalysisParametersUuid,
            UUID dynamicMarginCalculationParametersUuid,
            boolean debug) {
@@ -95,15 +94,11 @@ public class ParametersService {
                 .parameters(dynamicMarginCalculationParametersInfos)
                 .debug(debug)
                 .build();
-        runContext.setDynamicSimulationParametersJson(dynamicSimulationParametersJson);
+        runContext.setDynamicSimulationParametersUuid(dynamicSimulationParametersUuid);
         runContext.setDynamicSecurityAnalysisParametersUuid(dynamicSecurityAnalysisParametersUuid);
 
         // set provider for run context
-        String providerToUse = provider;
-        if (providerToUse == null) {
-            providerToUse = Optional.ofNullable(runContext.getParameters().getProvider()).orElse(defaultProvider);
-        }
-
+        String providerToUse = Optional.ofNullable(runContext.getParameters().getProvider()).orElse(defaultProvider);
         runContext.setProvider(providerToUse);
 
         // check provider
