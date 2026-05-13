@@ -6,6 +6,7 @@
  */
 package org.gridsuite.dynamicmargincalculation.server.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.datasource.ReadOnlyDataSource;
 import com.powsybl.commons.datasource.ResourceDataSource;
@@ -248,6 +249,77 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         // delete all results => ok
         mockMvc.perform(delete("/v1/results"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testStatus() throws Exception {
+        doReturn(CompletableFuture.completedFuture(MarginCalculationResult.empty()))
+                .when(dynamicMarginCalculationWorkerService).getCompletableFuture(any(), any(), any());
+
+        MvcResult result = mockMvc.perform(
+                        post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
+                                .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
+                                .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
+                                .param("parametersUuid", PARAMETERS_UUID.toString())
+                                .header(HEADER_USER_ID, "testUserId")
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID runUuid = objectMapper.readValue(result.getResponse().getContentAsString(), UUID.class);
+        Message<byte[]> resultMessage = output.receive(1000, dmcResultDestination);
+        assertThat(resultMessage).isNotNull();
+        assertThat(resultMessage.getHeaders()).containsEntry(HEADER_RESULT_UUID, runUuid.toString());
+
+        MvcResult statusResult = mockMvc.perform(get("/v1/results/{resultUuid}/status", runUuid))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        DynamicMarginCalculationStatus statusValue = objectMapper.readValue(
+                statusResult.getResponse().getContentAsString(),
+                DynamicMarginCalculationStatus.class
+        );
+        assertThat(statusValue).isIn(DynamicMarginCalculationStatus.SUCCEED, DynamicMarginCalculationStatus.RUNNING);
+    }
+
+    @Test
+    void testStatuses() throws Exception {
+        doReturn(CompletableFuture.completedFuture(MarginCalculationResult.empty()))
+                .when(dynamicMarginCalculationWorkerService).getCompletableFuture(any(), any(), any());
+
+        MvcResult result = mockMvc.perform(
+                        post("/v1/networks/{networkUuid}/run", NETWORK_UUID)
+                                .param(VARIANT_ID_HEADER, VARIANT_1_ID)
+                                .param("dynamicSimulationParametersUuid", DS_PARAMETERS_UUID.toString())
+                                .param("dynamicSecurityAnalysisParametersUuid", DSA_PARAMETERS_UUID.toString())
+                                .param("parametersUuid", PARAMETERS_UUID.toString())
+                                .header(HEADER_USER_ID, "testUserId")
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID runUuid = objectMapper.readValue(result.getResponse().getContentAsString(), UUID.class);
+        Message<byte[]> resultMessage = output.receive(1000, dmcResultDestination);
+        assertThat(resultMessage).isNotNull();
+        assertThat(resultMessage.getHeaders()).containsEntry(HEADER_RESULT_UUID, runUuid.toString());
+
+        UUID missingUuid = UUID.randomUUID();
+
+        String content = objectMapper.writeValueAsString(List.of(runUuid, missingUuid));
+        MvcResult statusesResult = mockMvc.perform(post("/v1/results/statuses")
+                        .contentType("application/json")
+                        .content(content))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Map<UUID, DynamicMarginCalculationStatus> statuses = objectMapper.readValue(statusesResult.getResponse().getContentAsString(), new TypeReference<Map<UUID, DynamicMarginCalculationStatus>>() {
+        });
+        assertThat(statuses)
+                .containsKey(runUuid)
+                .doesNotContainKey(missingUuid)
+                .extractingByKey(runUuid)
+                .isIn(DynamicMarginCalculationStatus.SUCCEED, DynamicMarginCalculationStatus.RUNNING);
     }
 
     @Test

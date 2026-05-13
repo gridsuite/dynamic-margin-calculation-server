@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.gridsuite.computation.service.AbstractResultContext.*;
@@ -88,6 +89,13 @@ public class DynamicMarginCalculationController {
     public ResponseEntity<DynamicMarginCalculationStatus> getStatus(@Parameter(description = "Result UUID") @PathVariable("resultUuid") UUID resultUuid) {
         DynamicMarginCalculationStatus result = dynamicMarginCalculationService.getStatus(resultUuid);
         return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping(value = "/results/statuses", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get dynamic margin calculation statuses from the database")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The dynamic margin calculation statuses")})
+    public ResponseEntity<Map<UUID, DynamicMarginCalculationStatus>> getStatuses(@Parameter(description = "Result uuids") @RequestBody List<UUID> resultUuids) {
+        return ResponseEntity.ok().body(dynamicMarginCalculationService.getStatuses(resultUuids));
     }
 
     @PutMapping(value = "/results/invalidate-status", produces = APPLICATION_JSON_VALUE)
