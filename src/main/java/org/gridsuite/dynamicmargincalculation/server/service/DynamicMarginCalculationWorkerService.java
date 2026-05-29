@@ -59,7 +59,8 @@ import static org.gridsuite.dynamicmargincalculation.server.service.DynamicMargi
  */
 @ComponentScan(basePackageClasses = {NetworkStoreService.class, NotificationService.class})
 @Service
-public class DynamicMarginCalculationWorkerService extends AbstractWorkerService<MarginCalculationResult, DynamicMarginCalculationRunContext, DynamicMarginCalculationParametersInfos, DynamicMarginCalculationResultService> {
+public class DynamicMarginCalculationWorkerService extends AbstractWorkerService<MarginCalculationResult, DynamicMarginCalculationRunContext, DynamicMarginCalculationParametersInfos,
+        DynamicMarginCalculationResultService> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicMarginCalculationWorkerService.class);
 
@@ -79,7 +80,8 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
                                                  DynamicSecurityAnalysisClient dynamicSecurityAnalysisClient,
                                                  ParametersService parametersService,
                                                  PropertyServerNameProvider propertyServerNameProvider) {
-        super(networkStoreService, notificationService, reportService, dynamicSecurityAnalysisResultService, computationS3Service, executionService, observer, objectMapper, propertyServerNameProvider);
+        super(networkStoreService, notificationService, reportService, dynamicSecurityAnalysisResultService, computationS3Service, executionService, observer, objectMapper,
+                propertyServerNameProvider);
         this.dynamicSimulationClient = Objects.requireNonNull(dynamicSimulationClient);
         this.dynamicSecurityAnalysisClient = Objects.requireNonNull(dynamicSecurityAnalysisClient);
         this.parametersService = Objects.requireNonNull(parametersService);
