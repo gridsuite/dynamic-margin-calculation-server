@@ -140,8 +140,7 @@ class DynamicMarginCalculationParametersControllerTest {
         DynamicMarginCalculationParametersInfos originalInfos = newParametersInfos();
         UUID originalUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(originalInfos)).getId();
 
-        MvcResult result = mockMvc.perform(post("/v1/parameters")
-                        .param("duplicateFrom", originalUuid.toString()))
+        MvcResult result = mockMvc.perform(post("/v1/parameters/{uuid}/duplicate", originalUuid))
                 .andExpect(status().isOk())
                 .andReturn();
 
