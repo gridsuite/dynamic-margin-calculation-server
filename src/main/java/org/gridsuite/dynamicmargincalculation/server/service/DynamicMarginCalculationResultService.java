@@ -21,8 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.gridsuite.computation.error.ComputationBusinessErrorCode.RESULT_NOT_FOUND;
 
@@ -105,6 +107,14 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
         return statusRepository.findByResultUuid(resultUuid)
             .map(DynamicMarginCalculationStatusEntity::getStatus)
             .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, DynamicMarginCalculationStatus> findStatuses(List<UUID> resultUuids) {
+        Objects.requireNonNull(resultUuids);
+        List<DynamicMarginCalculationStatusEntity> statusEntities = statusRepository.findAllById(resultUuids);
+        return statusEntities.stream().collect(Collectors.toMap(DynamicMarginCalculationStatusEntity::getResultUuid, DynamicMarginCalculationStatusEntity::getStatus));
     }
 
     @Transactional
