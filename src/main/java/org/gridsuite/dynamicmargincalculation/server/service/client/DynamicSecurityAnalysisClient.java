@@ -12,7 +12,7 @@ import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSecur
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,8 +34,8 @@ public class DynamicSecurityAnalysisClient extends AbstractRestClient {
 
     @Autowired
     public DynamicSecurityAnalysisClient(@Value("${gridsuite.services.dynamic-security-analysis-server.base-uri:http://dynamic-security-analysis-server/}") String baseUri,
-                                         RestTemplate restTemplate, ObjectMapper objectMapper) {
-        super(baseUri, restTemplate, objectMapper);
+                                         RestClient restClient, ObjectMapper objectMapper) {
+        super(baseUri, restClient, objectMapper);
     }
 
     public DynamicSecurityAnalysisParametersValues getParametersValues(UUID dynamicSecurityAnalysisParametersUuid, UUID networkUuid, String variant) {
@@ -48,7 +48,7 @@ public class DynamicSecurityAnalysisClient extends AbstractRestClient {
 
         // call dynamic security analysis REST API
         String url = uriComponents.toUriString();
-        DynamicSecurityAnalysisParametersValues result = getRestTemplate().getForObject(url, DynamicSecurityAnalysisParametersValues.class);
+        DynamicSecurityAnalysisParametersValues result = getRestClient().get().uri(url).retrieve().body(DynamicSecurityAnalysisParametersValues.class);
         logger.debug(DYNAMIC_SECURITY_ANALYSIS_REST_API_CALLED_SUCCESSFULLY_MESSAGE, url);
         return result;
     }
