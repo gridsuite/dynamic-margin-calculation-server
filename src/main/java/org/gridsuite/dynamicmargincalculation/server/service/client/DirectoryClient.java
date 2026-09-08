@@ -13,11 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.dynamicmargincalculation.server.dto.ElementAttributes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
@@ -41,10 +39,10 @@ public class DirectoryClient extends AbstractRestClient {
 
     protected DirectoryClient(
             @Value("${gridsuite.services.directory-server.base-uri:http://directory-server/}") String baseUri,
-            RestTemplate restTemplate,
+            RestClient restClient,
             ObjectMapper objectMapper
     ) {
-        super(baseUri, restTemplate, objectMapper);
+        super(baseUri, restClient, objectMapper);
     }
 
     public Map<UUID, String> getElementNames(List<UUID> ids, String userId) {
@@ -63,13 +61,12 @@ public class DirectoryClient extends AbstractRestClient {
             headers.set(HEADER_USER_ID, userId);
         }
 
-        List<ElementAttributes> elementAttributes = getRestTemplate()
-            .exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.GET,
-                new HttpEntity<>(headers),
-                new ParameterizedTypeReference<List<ElementAttributes>>() { }
-            ).getBody();
+        List<ElementAttributes> elementAttributes = getRestClient()
+            .get()
+            .uri(uriComponentsBuilder.build().toUriString())
+            .headers(httpHeaders -> httpHeaders.addAll(headers))
+            .retrieve()
+            .body(new ParameterizedTypeReference<>() { });
 
         return elementAttributes == null ?
                 Collections.emptyMap() :

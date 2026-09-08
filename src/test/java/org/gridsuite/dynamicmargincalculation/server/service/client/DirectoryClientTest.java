@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ class DirectoryClientTest extends AbstractRestClientTest {
     private DirectoryClient directoryClient;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestClient restClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,7 +53,7 @@ class DirectoryClientTest extends AbstractRestClientTest {
         directoryClient = new DirectoryClient(
                 // use new WireMockServer(DIRECTORY_PORT) to test with local server if needed
                 initMockWebServer(new WireMockServer(wireMockConfig().dynamicPort())),
-                restTemplate,
+                restClient,
                 objectMapper
         );
     }

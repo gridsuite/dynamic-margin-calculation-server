@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +39,7 @@ class DynamicSecurityAnalysisClientTest extends AbstractRestClientTest {
     private DynamicSecurityAnalysisClient dynamicSecurityAnalysisClient;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestClient restClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,7 +49,7 @@ class DynamicSecurityAnalysisClientTest extends AbstractRestClientTest {
         // use new WireMockServer(DYNAMIC_SECURITY_ANALYSIS_PORT) to test with local server if needed
         dynamicSecurityAnalysisClient = new DynamicSecurityAnalysisClient(
                 initMockWebServer(new WireMockServer(wireMockConfig().dynamicPort())),
-                restTemplate,
+                restClient,
                 objectMapper
         );
     }
