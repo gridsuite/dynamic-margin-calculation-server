@@ -361,7 +361,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         UUID runUuid = objectMapper.readValue(result.getResponse().getContentAsString(), UUID.class);
 
         // Should be running quickly after creation
-        assertResultStatus(runUuid, DynamicMarginCalculationStatus.RUNNING);
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.PRELOADING);
 
         // stop, with a timeout to avoid test hangs if an exception occurs before latch countdown
         boolean completed = cancelLatch.await(5, TimeUnit.SECONDS);
@@ -434,7 +434,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                 .containsKey(HEADER_MESSAGE);
 
         // cancel failed so result still exists (status remains RUNNING in this behaviour)
-        assertResultStatus(runUuid, DynamicMarginCalculationStatus.RUNNING);
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.PRELOADING);
     }
 
     @Test
