@@ -242,4 +242,9 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
     protected void setRunningStatus(UUID resultUuid) {
         resultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.RUNNING);
     }
+
+    @Override
+    protected boolean canBeCancelled(UUID resultUuid) {
+        return resultService.findStatus(resultUuid) == DynamicMarginCalculationStatus.RUNNING;
+    }
 }
