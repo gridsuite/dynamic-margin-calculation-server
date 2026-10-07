@@ -230,6 +230,28 @@ class DynamicMarginCalculationParametersControllerTest {
     }
 
     @Test
+    void testResetParameters() throws Exception {
+        DynamicMarginCalculationParametersInfos infos = newParametersInfos();
+        infos.setAccuracy(infos.getAccuracy() + 1); // change a field to ensure reset restores the default value
+        UUID parametersUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(infos)).getId();
+
+        mockMvc.perform(put("/v1/parameters/{uuid}/reset", parametersUuid))
+                .andExpect(status().isOk());
+
+        Optional<DynamicMarginCalculationParametersEntity> entityOpt = parametersRepository.findById(parametersUuid);
+        assertThat(entityOpt).isPresent();
+
+        DynamicMarginCalculationParametersInfos persisted = entityOpt.get().toDto(false);
+        assertThat(persisted.getAccuracy()).isEqualTo(parametersService.getDefaultParametersValues().getAccuracy());
+    }
+
+    @Test
+    void testResetParametersNotFound() throws Exception {
+        mockMvc.perform(put("/v1/parameters/{uuid}/reset", UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void testDeleteParameters() throws Exception {
         DynamicMarginCalculationParametersInfos infos = newParametersInfos();
         UUID parametersUuid = parametersRepository.save(new DynamicMarginCalculationParametersEntity(infos)).getId();
