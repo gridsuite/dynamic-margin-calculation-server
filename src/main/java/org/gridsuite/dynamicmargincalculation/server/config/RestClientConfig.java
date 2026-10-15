@@ -14,7 +14,7 @@ import com.powsybl.dynamicsimulation.json.DynamicSimulationParametersJsonModule;
 import com.powsybl.dynawo.margincalculation.json.MarginCalculationParametersJsonModule;
 import com.powsybl.security.dynamic.json.DynamicSecurityAnalysisJsonModule;
 import org.gridsuite.computation.ComputationConfig;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -32,7 +32,7 @@ public class RestClientConfig {
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
 
         return restClientBuilder
-                .messageConverters(converters -> converters.add(messageConverter))
+                .messageConverters(converters -> converters.add(0, messageConverter))
                 .build();
     }
 
