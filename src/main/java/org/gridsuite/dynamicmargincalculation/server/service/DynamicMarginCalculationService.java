@@ -46,7 +46,7 @@ public class DynamicMarginCalculationService extends AbstractComputationService<
     public UUID runAndSaveResult(DynamicMarginCalculationRunContext runContext) {
         // insert a new result entity with running status
         UUID resultUuid = uuidGeneratorService.generate();
-        resultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.RUNNING);
+        resultService.insertStatus(List.of(resultUuid), DynamicMarginCalculationStatus.PRELOADING);
 
         // emit a message to launch the dynamic security analysis by the worker service
         Message<String> message = new DynamicMarginCalculationResultContext(resultUuid, runContext).toMessage(objectMapper);
