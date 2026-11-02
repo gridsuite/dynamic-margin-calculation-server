@@ -6,7 +6,6 @@
  */
 package org.gridsuite.dynamicmargincalculation.server.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.datasource.ReadOnlyDataSource;
 import com.powsybl.commons.datasource.ResourceDataSource;
@@ -15,6 +14,7 @@ import com.powsybl.contingency.Contingency;
 import com.powsybl.dynamicsimulation.DynamicSimulationParameters;
 import com.powsybl.dynawo.DynawoSimulationParameters;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import com.powsybl.iidm.network.Importers;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.VariantManagerConstants;
@@ -156,7 +156,8 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
             assert dynamicModelIS != null;
             // temporal :  use custom ObjectMapper provided by powsybl-dynawo to deserialize dynamic model
             ObjectMapper dynamicModelConfigObjectMapper = DynamicModelConfigJsonUtils.createObjectMapper();
-            List<DynamicModelConfig> dynamicModel = dynamicModelConfigObjectMapper.readValue(dynamicModelIS, new TypeReference<>() { });
+            DynamicModelConfigs dynamicModelConfigs = dynamicModelConfigObjectMapper.readValue(dynamicModelIS, DynamicModelConfigs.class);
+            List<DynamicModelConfig> dynamicModel = dynamicModelConfigs.dynamicModelConfigList();
 
             // load dynamicSimulationParameters.dmp
             String dynamicSimulationParametersFilePath = inputDir + RESOURCE_PATH_DELIMITER + DYNAMIC_SIMULATION_PARAMETERS_DUMP_FILE;

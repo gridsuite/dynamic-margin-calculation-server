@@ -10,9 +10,8 @@ package org.gridsuite.dynamicmargincalculation.server.controller.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.powsybl.commons.json.JsonUtil;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigsJsonDeserializer;
-
-import java.util.List;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -27,7 +26,7 @@ public final class DynamicModelConfigJsonUtils {
         ObjectMapper mapper = JsonUtil.createObjectMapper();
 
         SimpleModule module = new SimpleModule("dynamic-model-configs");
-        module.addDeserializer(List.class, new DynamicModelConfigsJsonDeserializer());
+        module.addDeserializer(DynamicModelConfigs.class, new DynamicModelConfigsJsonDeserializer());
 
         mapper.registerModule(module);
         return mapper;
