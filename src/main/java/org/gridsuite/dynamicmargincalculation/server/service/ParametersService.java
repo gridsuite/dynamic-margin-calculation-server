@@ -23,9 +23,9 @@ import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculat
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationParametersRepository;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DirectoryClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationRunContext;
-import org.gridsuite.filter.AbstractFilter;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.filter.expertfilter.expertrule.FilterUuidExpertRule;
+import org.gridsuite.filter.dto.AbstractFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.expertrule.FilterUuidExpertRule;
 import org.gridsuite.filter.utils.EquipmentType;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;

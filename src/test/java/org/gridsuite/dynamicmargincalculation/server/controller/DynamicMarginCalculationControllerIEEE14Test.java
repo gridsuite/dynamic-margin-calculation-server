@@ -23,9 +23,9 @@ import org.gridsuite.dynamicmargincalculation.server.controller.utils.DynamicMod
 import org.gridsuite.dynamicmargincalculation.server.dto.DynamicMarginCalculationStatus;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.*;
 import org.gridsuite.dynamicmargincalculation.server.entities.parameters.DynamicMarginCalculationParametersEntity;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.filter.expertfilter.expertrule.CombinatorExpertRule;
-import org.gridsuite.filter.expertfilter.expertrule.StringExpertRule;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.expertrule.CombinatorExpertRule;
+import org.gridsuite.filter.dto.expertfilter.expertrule.StringExpertRule;
 import org.gridsuite.filter.utils.EquipmentType;
 import org.gridsuite.filter.utils.expertfilter.CombinatorType;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
