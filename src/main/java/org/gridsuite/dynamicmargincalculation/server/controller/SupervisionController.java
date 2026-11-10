@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.gridsuite.dynamicmargincalculation.server.DynamicMarginCalculationApi;
-import org.gridsuite.dynamicmargincalculation.server.service.DynamicMarginCalculationService;
 import org.gridsuite.dynamicmargincalculation.server.service.SupervisionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Dynamic margin calculation server - Supervision")
 public class SupervisionController {
     private final SupervisionService supervisionService;
-    private final DynamicMarginCalculationService dynamicMarginCalculationService;
 
-    public SupervisionController(SupervisionService supervisionService, DynamicMarginCalculationService dynamicMarginCalculationService) {
+    public SupervisionController(SupervisionService supervisionService) {
         this.supervisionService = supervisionService;
-        this.dynamicMarginCalculationService = dynamicMarginCalculationService;
     }
 
     @GetMapping(value = "/results-count")
@@ -46,7 +43,7 @@ public class SupervisionController {
     @Operation(summary = "Delete all dynamic margin calculation results from the database")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "All dynamic margin calculation results have been deleted")})
     public ResponseEntity<Void> deleteAllResults() {
-        dynamicMarginCalculationService.deleteAllResults();
+        supervisionService.deleteAllResults();
         return ResponseEntity.ok().build();
     }
 }
