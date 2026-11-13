@@ -34,6 +34,9 @@ class DynamicMarginCalculationResultServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicMarginCalculationResultServiceTest.class);
 
     @Autowired
+    private SupervisionService supervisionService;
+
+    @Autowired
     DynamicMarginCalculationStatusRepository statusRepository;
 
     @Autowired
@@ -106,7 +109,7 @@ class DynamicMarginCalculationResultServiceTest {
                 new DynamicMarginCalculationStatusEntity(UUID.randomUUID(), DynamicMarginCalculationStatus.RUNNING)
         ));
 
-        dynamicMarginCalculationResultService.deleteAll();
+        supervisionService.deleteAllResults();
         assertThat(statusRepository.findAll()).isEmpty();
     }
 }
