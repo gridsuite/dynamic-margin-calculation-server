@@ -23,11 +23,10 @@ import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculat
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationParametersRepository;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DirectoryClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationRunContext;
-import org.gridsuite.filter.AbstractFilter;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.filter.expertfilter.expertrule.FilterUuidExpertRule;
+import org.gridsuite.filter.dto.AbstractFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.expertrule.FilterUuidExpertRule;
 import org.gridsuite.filter.utils.EquipmentType;
-import org.gridsuite.filter.utils.FiltersUtils;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -237,7 +236,7 @@ public class ParametersService {
                     .build())
                 .build();
 
-            List<Load> loads = FiltersUtils.getIdentifiables(filter, network, filterService::getFilters).stream()
+            List<Load> loads = filter.toFilter(filterService::getFilters).evaluate(network).stream()
                     .map(Load.class::cast).toList();
             return new LoadsVariation(loads, loadsVariationInfos.getVariation());
         }).toList();
