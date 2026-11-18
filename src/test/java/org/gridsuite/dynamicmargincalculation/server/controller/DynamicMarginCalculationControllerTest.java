@@ -234,6 +234,10 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                         .param("resultUuid", UUID.randomUUID().toString()))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(delete("/v1/results")).andExpect(status().isBadRequest());
+        mockMvc.perform(delete("/v1/results").queryParam("resultsUuids", "")).andExpect(status().isOk());
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.NOT_DONE);
+
         // delete one result
         mockMvc.perform(delete("/v1/results/{resultUuid}", runUuid))
                 .andExpect(status().isOk());
@@ -246,7 +250,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                 .andExpect(status().isOk());
 
         // delete all results => ok
-        mockMvc.perform(delete("/v1/results"))
+        mockMvc.perform(delete("/v1/supervision/results"))
                 .andExpect(status().isOk());
     }
 
