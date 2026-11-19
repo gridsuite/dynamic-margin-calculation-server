@@ -91,7 +91,6 @@ public class DynamicMarginCalculationResultService extends AbstractComputationRe
         resultRepository.deleteByResultUuid(resultUuid);
     }
 
-    @Override
     @Transactional
     public DynamicMarginCalculationStatus findStatus(UUID resultUuid) {
         Objects.requireNonNull(resultUuid);
