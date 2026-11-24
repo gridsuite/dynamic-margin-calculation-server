@@ -20,7 +20,7 @@ import com.powsybl.dynawo.margincalculation.MarginCalculationRunParameters;
 import com.powsybl.dynawo.margincalculation.loadsvariation.LoadsVariation;
 import com.powsybl.dynawo.margincalculation.loadsvariation.supplier.LoadsVariationSupplier;
 import com.powsybl.dynawo.margincalculation.results.MarginCalculationResult;
-import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynawoModelsSupplier;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
@@ -138,7 +138,9 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
                 runContext.getNetworkUuid(), runContext.getVariantId());
 
         // get dynamic model list from dynamic simulation server
-        List<DynamicModelConfig> dynamicModel = dynamicSimulationParametersValues.getDynamicModel();
+        // the dynamic simulation server omits an empty dynamic model
+        DynamicModelConfigs dynamicModel = Optional.ofNullable(dynamicSimulationParametersValues.getDynamicModel())
+                .orElseGet(() -> new DynamicModelConfigs(List.of()));
 
         // get dynawo parameters from the dynamic simulation server
         DynawoSimulationParameters dynawoParameters = dynamicSimulationParametersValues.getDynawoParameters();
@@ -181,7 +183,7 @@ public class DynamicMarginCalculationWorkerService extends AbstractWorkerService
     @Override
     public CompletableFuture<MarginCalculationResult> getCompletableFuture(DynamicMarginCalculationRunContext runContext, String provider, UUID resultUuid) {
 
-        DynamicModelsSupplier dynamicModelsSupplier = new DynawoModelsSupplier(runContext.getDynamicModel());
+        DynamicModelsSupplier dynamicModelsSupplier = new DynawoModelsSupplier(runContext.getDynamicModel().dynamicModelConfigList());
 
         List<Contingency> contingencies = runContext.getContingencies();
         ContingenciesProvider contingenciesProvider = network -> contingencies;

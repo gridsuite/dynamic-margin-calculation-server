@@ -13,7 +13,6 @@ import com.powsybl.commons.datasource.ResourceSet;
 import com.powsybl.contingency.Contingency;
 import com.powsybl.dynamicsimulation.DynamicSimulationParameters;
 import com.powsybl.dynawo.DynawoSimulationParameters;
-import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import com.powsybl.iidm.network.Importers;
 import com.powsybl.iidm.network.Network;
@@ -157,7 +156,6 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
             // temporal :  use custom ObjectMapper provided by powsybl-dynawo to deserialize dynamic model
             ObjectMapper dynamicModelConfigObjectMapper = DynamicModelConfigJsonUtils.createObjectMapper();
             DynamicModelConfigs dynamicModelConfigs = dynamicModelConfigObjectMapper.readValue(dynamicModelIS, DynamicModelConfigs.class);
-            List<DynamicModelConfig> dynamicModel = dynamicModelConfigs.dynamicModelConfigList();
 
             // load dynamicSimulationParameters.dmp
             String dynamicSimulationParametersFilePath = inputDir + RESOURCE_PATH_DELIMITER + DYNAMIC_SIMULATION_PARAMETERS_DUMP_FILE;
@@ -168,7 +166,7 @@ public class DynamicMarginCalculationControllerIEEE14Test extends AbstractDynami
             // Mock for dynamic simulation server
             when(dynamicSimulationClient.getParametersValues(eq(DS_PARAMETERS_UUID), eq(NETWORK_UUID), any()))
                     .thenReturn(DynamicSimulationParametersValues.builder()
-                            .dynamicModel(dynamicModel)
+                            .dynamicModel(dynamicModelConfigs)
                             .dynawoParameters(dynamicSimulationParameters.getExtension(DynawoSimulationParameters.class))
                             .build());
         } catch (IOException e) {
