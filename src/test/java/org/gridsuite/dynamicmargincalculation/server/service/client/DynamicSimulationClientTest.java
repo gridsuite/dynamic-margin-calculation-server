@@ -18,6 +18,7 @@ import com.powsybl.dynawo.suppliers.PropertyBuilder;
 import com.powsybl.dynawo.suppliers.PropertyType;
 import com.powsybl.dynawo.suppliers.SetGroupType;
 import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import org.gridsuite.dynamicmargincalculation.server.dto.parameters.DynamicSimulationParametersValues;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -71,12 +72,12 @@ class DynamicSimulationClientTest extends AbstractRestClientTest {
         String variantId = "variant_1";
 
         // prepare dynamic model
-        List<DynamicModelConfig> dynamicModel = List.of(new DynamicModelConfig("LoadAlphaBeta", "_DM", SetGroupType.SUFFIX, List.of(
+        DynamicModelConfigs dynamicModel = new DynamicModelConfigs(List.of(new DynamicModelConfig("LoadAlphaBeta", "_DM", SetGroupType.SUFFIX, List.of(
                 new PropertyBuilder()
                         .name("staticId")
                         .value("LOAD")
                         .type(PropertyType.STRING)
-                        .build())));
+                        .build()))));
 
         // prepare dynawo simulation parameters
         DynawoSimulationParameters dynawoParameters = DynawoSimulationParameters.load();

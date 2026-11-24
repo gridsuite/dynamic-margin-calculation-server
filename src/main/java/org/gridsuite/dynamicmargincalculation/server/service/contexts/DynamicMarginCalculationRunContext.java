@@ -9,7 +9,7 @@ package org.gridsuite.dynamicmargincalculation.server.service.contexts;
 import com.powsybl.contingency.Contingency;
 import com.powsybl.dynawo.margincalculation.MarginCalculationParameters;
 import com.powsybl.dynawo.margincalculation.loadsvariation.LoadsVariation;
-import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfig;
+import com.powsybl.dynawo.suppliers.dynamicmodels.DynamicModelConfigs;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +32,7 @@ public class DynamicMarginCalculationRunContext extends AbstractComputationRunCo
 
     // --- Fields which are enriched in worker service --- //
 
-    private List<DynamicModelConfig> dynamicModel;
+    private DynamicModelConfigs dynamicModel;
     private MarginCalculationParameters marginCalculationParameters;
     private List<Contingency> contingencies;
     private List<LoadsVariation> loadsVariations;
