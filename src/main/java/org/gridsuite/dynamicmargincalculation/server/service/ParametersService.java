@@ -23,11 +23,10 @@ import org.gridsuite.dynamicmargincalculation.server.error.DynamicMarginCalculat
 import org.gridsuite.dynamicmargincalculation.server.repositories.DynamicMarginCalculationParametersRepository;
 import org.gridsuite.dynamicmargincalculation.server.service.client.DirectoryClient;
 import org.gridsuite.dynamicmargincalculation.server.service.contexts.DynamicMarginCalculationRunContext;
-import org.gridsuite.filter.AbstractFilter;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.filter.expertfilter.expertrule.FilterUuidExpertRule;
+import org.gridsuite.filter.dto.AbstractFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.expertrule.FilterUuidExpertRule;
 import org.gridsuite.filter.utils.EquipmentType;
-import org.gridsuite.filter.utils.FiltersUtils;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,12 +193,15 @@ public class ParametersService {
     public void updateParameters(UUID parametersUuid, DynamicMarginCalculationParametersInfos parametersInfos) {
         DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
                 .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
-        if (parametersInfos == null) {
-            // if the parameter is null, it means it's a reset to defaultValues
-            entity.update(getDefaultParametersValues());
-        } else {
-            entity.update(parametersInfos);
-        }
+        entity.update(parametersInfos);
+    }
+
+    @Transactional
+    public void resetParameters(UUID parametersUuid) {
+        DynamicMarginCalculationParametersEntity entity = dynamicMarginCalculationParametersRepository.findById(parametersUuid)
+                .orElseThrow(() -> new ComputationException(PARAMETERS_NOT_FOUND, MSG_PARAMETERS_UUID_NOT_FOUND + parametersUuid));
+
+        entity.update(getDefaultParametersValues());
     }
 
     @Transactional
@@ -237,7 +239,7 @@ public class ParametersService {
                     .build())
                 .build();
 
-            List<Load> loads = FiltersUtils.getIdentifiables(filter, network, filterService::getFilters).stream()
+            List<Load> loads = filter.toFilter(filterService).evaluate(network).stream()
                     .map(Load.class::cast).toList();
             return new LoadsVariation(loads, loadsVariationInfos.getVariation());
         }).toList();

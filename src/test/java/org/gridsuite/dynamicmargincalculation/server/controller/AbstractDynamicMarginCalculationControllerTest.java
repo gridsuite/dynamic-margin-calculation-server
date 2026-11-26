@@ -111,7 +111,7 @@ public abstract class AbstractDynamicMarginCalculationControllerTest extends Abs
         super.tearDown();
 
         // delete all results
-        mockMvc.perform(delete("/v1/results"))
+        mockMvc.perform(delete("/v1/supervision/results"))
                 .andExpect(status().isOk());
 
         // ensure queues are empty then clear

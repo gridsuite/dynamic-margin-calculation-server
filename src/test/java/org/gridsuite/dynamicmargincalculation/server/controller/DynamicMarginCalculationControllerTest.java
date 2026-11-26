@@ -234,6 +234,10 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                         .param("resultUuid", UUID.randomUUID().toString()))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(delete("/v1/results")).andExpect(status().isBadRequest());
+        mockMvc.perform(delete("/v1/results").queryParam("resultsUuids", "")).andExpect(status().isOk());
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.NOT_DONE);
+
         // delete one result
         mockMvc.perform(delete("/v1/results/{resultUuid}", runUuid))
                 .andExpect(status().isOk());
@@ -246,7 +250,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                 .andExpect(status().isOk());
 
         // delete all results => ok
-        mockMvc.perform(delete("/v1/results"))
+        mockMvc.perform(delete("/v1/supervision/results"))
                 .andExpect(status().isOk());
     }
 
@@ -361,7 +365,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         UUID runUuid = objectMapper.readValue(result.getResponse().getContentAsString(), UUID.class);
 
         // Should be running quickly after creation
-        assertResultStatus(runUuid, DynamicMarginCalculationStatus.RUNNING);
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.PRELOADING);
 
         // stop, with a timeout to avoid test hangs if an exception occurs before latch countdown
         boolean completed = cancelLatch.await(5, TimeUnit.SECONDS);
@@ -412,7 +416,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
         CountDownLatch cancelLatch = new CountDownLatch(1);
 
         // Emit messages in separate threads, like in production.
-        mockSendRunMessage(() -> CompletableFuture.supplyAsync(() -> null));
+        mockSendRunMessage(() -> CompletableFuture.supplyAsync(MarginCalculationResult::empty));
 
         // Delay before the computation starts to simulate "cancel too early"
         doAnswer(invocation -> {
@@ -420,7 +424,7 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
 
             cancelLatch.countDown();
 
-            await().pollDelay(1000, TimeUnit.MILLISECONDS).until(() -> true);
+            await().pollDelay(500, TimeUnit.MILLISECONDS).until(() -> true);
             return object;
         }).when(dynamicMarginCalculationWorkerService).preRun(any());
 
@@ -433,8 +437,14 @@ public class DynamicMarginCalculationControllerTest extends AbstractDynamicMargi
                 .containsEntry(HEADER_RESULT_UUID, runUuid.toString())
                 .containsKey(HEADER_MESSAGE);
 
-        // cancel failed so result still exists (status remains RUNNING in this behaviour)
-        assertResultStatus(runUuid, DynamicMarginCalculationStatus.RUNNING);
+        // the computation continues to run in the background
+        // Must have a result message in the result queue when computation finished
+        message = output.receive(1000, dmcResultDestination);
+        assertThat(message.getHeaders())
+                .containsEntry(HEADER_RESULT_UUID, runUuid.toString());
+
+        // end computation status must be SUCCEED
+        assertResultStatus(runUuid, DynamicMarginCalculationStatus.SUCCEED);
     }
 
     @Test
